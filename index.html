@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+	<table id="repGrid">
+		<tr>
+			<td></td>
+			<th>a</th>
+			<th>b</th>
+			<td></td>
+		</tr>
+		<tr>
+			<th>test</th>
+		</tr>
+	</table>
+	
+	<input type="text" id="label"></input>
+	<button type="button" id="row">+</button>
+	<script>
+	var button = document.getElementById('row');
+	button.onclick = createRow;
+	
+	function createRow(labelLeft) {
+		var label = document.getElementById('label').value;
+		if (label != '') {
+			document.getElementById('label').value = '';
+			var table = document.getElementById('repGrid');
+			var row = table.insertRow(-1);
+			var headerCell = document.createElement('th');
+			headerCell.innerHTML = label;
+			row.appendChild(headerCell);
+		}
+	}
+	</script>
+</body>
+</html>
