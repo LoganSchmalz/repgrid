@@ -1,7 +1,8 @@
 table {
     border-collapse: collapse;
+	border-style: hidden;
 }
 
-table, td, th {
+td, th {
     border: 1px solid black;
 }
