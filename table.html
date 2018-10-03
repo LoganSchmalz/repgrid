@@ -2,28 +2,35 @@
 <html>
 <head>
 	<link rel="stylesheet" href="style.css">
-	<script src="table.js"></script>
+	<script type="text/javascript" src="xlsx.core.min.js"></script>
+	<script type="text/javascript" src="FileSaver.min.js"></script>
+	<script type="text/javascript" src="table.js"></script>
+	<script type="text/javascript" src="tableexport.min.js"></script>
 </head>
 <body>
 	<div style="float:left">
 		<table id="repGrid">
 			<tr>
-				<td>Rating</td>
-				<th>Element1</th>
-				<th>Element2</th>
-				<td>Rating</td>
+				<td contenteditable="true">1</td>
+				<th contenteditable="true">Element1</th>
+				<th contenteditable="true">Element2</th>
+				<td contenteditable="true">7</td>
 			</tr>
 			<tr>
-				<th>Construct1</th>
-				<td><input></td>
-				<td><input></td>
-				<th>Not Construct1</th>
+				<th contenteditable="true">Construct1</th>
+				<td contenteditable="true"></td>
+				<td contenteditable="true"></td>
+				<th contenteditable="true">Not Construct1</th>
 			</tr>
 		</table>
 		<input type="text" id="rowLabel">
 		<button type="button" id="row" onclick="createRow();">+</button>
+		<a onclick="removeRow();" href="#">Delete Row</a>
 	</div>
 	<input type="text" id="columnLabel">
 	<button type="button" id="column" onclick="createColumn();">+</button>
+	<a onclick="removeColumn();" href="#">Delete Column</a>
+
+	<button type="button" id="export" onclick="TableExport(document.getElementById('repGrid'));">Export</button>
 </body>
 </html>
