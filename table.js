@@ -1,8 +1,3 @@
-//function init() {
-//	var button = document.getElementById("row");
-//	button.onclick = createRow;
-//}
-
 function createRow() {
 	var rowLabel = document.getElementById("rowLabel");
 	var label = rowLabel.value; //get input
@@ -68,4 +63,51 @@ function removeColumn() {
 			table.rows[i].deleteCell(table.rows[i].cells.length - 2);
 		}
 	}
+}
+
+function exportToXLSX() {
+	var instance = new TableExport(document.getElementById("repGrid"), {
+		formats: ["xlsx"],
+		exportButtons: false
+	});
+	var exportData = instance.getExportData()["repGrid"]["xlsx"];
+	instance.export2file(exportData.data, exportData.mimeType, exportData.filename, exportData.fileExtension);
+}
+
+function exportToTXT() {
+	var table = document.getElementById("repGrid");
+	
+	numRow = table.rows.length;
+	numCol = table.rows[0].cells.length;
+	
+	var txt = new String;
+	txt += "RANGE\n" + table.rows[0].cells[0].innerHTML + " " + table.rows[0].cells[table.rows[0].cells.length - 1].innerHTML + "\nEND RANGE\n";
+	
+	txt += "ELEMENTS\n"
+	for (var col = 1; col < numCol - 1; col++) {
+		txt += table.rows[0].cells[col].innerHTML + "\n";
+	}
+	txt += "END ELEMENTS\n";
+	
+	txt += "CONSTUCTS\n"
+	for (var row = 1; row < numRow; row++) {
+		txt += table.rows[row].cells[0].innerHTML + " : " + table.rows[row].cells[table.rows[row].cells.length - 1].innerHTML + "\n";
+	}
+	txt += "END CONSTRUCTS\n"
+	
+	txt += "RATINGS\n"
+	for (var row = 1; row < numRow; row++) {
+		for (var col = 1; col < numCol - 1; col++) {
+			txt += table.rows[row].cells[col].innerHTML;
+			txt += col < numCol - 2 ? " " : "";
+		}
+		txt += "\n";
+	}
+	txt += "END RATINGS\n"
+	
+	var FileSaver = require("file-saverjs");
+	var blob = new Blob([txt], {type: "text/plain;charset=utf-8});
+	FileSaver.saveAs(blob, "repGrid.txt");
+	
+	console.log(txt);
 }
