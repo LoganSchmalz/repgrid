@@ -81,33 +81,30 @@ function exportToTXT() {
 	numCol = table.rows[0].cells.length;
 	
 	var txt = new String;
-	txt += "RANGE\n" + table.rows[0].cells[0].innerHTML + " " + table.rows[0].cells[table.rows[0].cells.length - 1].innerHTML + "\nEND RANGE\n";
+	txt += "RANGE\r\n" + table.rows[0].cells[0].innerHTML + " " + table.rows[0].cells[table.rows[0].cells.length - 1].innerHTML + "\r\nEND RANGE\r\n";
 	
-	txt += "ELEMENTS\n"
+	txt += "ELEMENTS\r\n"
 	for (var col = 1; col < numCol - 1; col++) {
-		txt += table.rows[0].cells[col].innerHTML + "\n";
+		txt += table.rows[0].cells[col].innerHTML + "\r\n";
 	}
-	txt += "END ELEMENTS\n";
+	txt += "END ELEMENTS\r\n";
 	
-	txt += "CONSTUCTS\n"
+	txt += "CONSTUCTS\r\n"
 	for (var row = 1; row < numRow; row++) {
-		txt += table.rows[row].cells[0].innerHTML + " : " + table.rows[row].cells[table.rows[row].cells.length - 1].innerHTML + "\n";
+		txt += table.rows[row].cells[0].innerHTML + " : " + table.rows[row].cells[table.rows[row].cells.length - 1].innerHTML + "\r\n";
 	}
-	txt += "END CONSTRUCTS\n"
+	txt += "END CONSTRUCTS\r\n"
 	
-	txt += "RATINGS\n"
+	txt += "RATINGS\r\n"
 	for (var row = 1; row < numRow; row++) {
 		for (var col = 1; col < numCol - 1; col++) {
 			txt += table.rows[row].cells[col].innerHTML;
 			txt += col < numCol - 2 ? " " : "";
 		}
-		txt += "\n";
+		txt += "\r\n";
 	}
-	txt += "END RATINGS\n"
+	txt += "END RATINGS\r\n"
 	
-	var FileSaver = require("file-saverjs");
-	var blob = new Blob([txt], {type: "text/plain;charset=utf-8});
-	FileSaver.saveAs(blob, "repGrid.txt");
-	
-	console.log(txt);
+	var blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
+	saveAs(blob, "repGrid.txt");
 }
