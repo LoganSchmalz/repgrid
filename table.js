@@ -3,7 +3,7 @@ function createRow() {
 	var label = rowLabel.value; //get input
 	
 	if (label != "") {
-		var table = document.getElementById("repGrid"); //get table and add row
+		var table = document.getElementById("repGrid");
 		var row = table.insertRow(-1);
 		
 		var headerCell = document.createElement("th"); //create left side
@@ -18,7 +18,7 @@ function createRow() {
 		}
 		
 		headerCell = document.createElement("th"); //must create new element to make new object
-		headerCell.innerHTML = "Not " + label; //makin the not-construct on the right side
+		headerCell.innerHTML = "Not " + label; //make the not-construct on the right side
 		headerCell.contentEditable = "true";
 		row.appendChild(headerCell);
 		
@@ -31,8 +31,8 @@ function createColumn() {
 	var label = columnLabel.value; //get input
 	
 	if (label != "") {
-		var table = document.getElementById("repGrid"); //get table
-		var columnNum = table.rows[0].cells.length - 1; //subtract one so we know index of last column (arrays start at 0)
+		var table = document.getElementById("repGrid");
+		var columnNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
 		
 		var headerCell = document.createElement("th"); //create construct label
 		headerCell.innerHTML = label;
@@ -51,14 +51,14 @@ function createColumn() {
 
 function removeRow() {
 	var table = document.getElementById("repGrid");
-	if (table.rows.length > 1) {
+	if (table.rows.length > 1) { //make sure at least 2 rows are left
 		table.deleteRow(table.rows.length - 1);
 	}
 }
 
 function removeColumn() {
 	var table = document.getElementById("repGrid");
-	if (table.rows[0].cells.length > 2) {
+	if (table.rows[0].cells.length > 2) { //make sure at least 2 columns are left
 		for (var i = 0; i < table.rows.length; i++) {
 			table.rows[i].deleteCell(table.rows[i].cells.length - 2);
 		}
@@ -79,32 +79,66 @@ function exportToTXT() {
 	
 	numRow = table.rows.length;
 	numCol = table.rows[0].cells.length;
-	
-	var txt = new String;
-	txt += "RANGE\r\n" + table.rows[0].cells[0].innerHTML + " " + table.rows[0].cells[table.rows[0].cells.length - 1].innerHTML + "\r\nEND RANGE\r\n";
-	
+	//format range
+	var txt = "\r\n";
+	txt += `RANGE\r\n${table.rows[0].cells[0].innerHTML} ${table.rows[0].cells[numCol - 1].innerHTML}\r\nEND RANGE\r\n\r\n`;
+	//format elements
 	txt += "ELEMENTS\r\n"
 	for (var col = 1; col < numCol - 1; col++) {
-		txt += table.rows[0].cells[col].innerHTML + "\r\n";
+		txt += `${table.rows[0].cells[col].innerHTML}\r\n`;
 	}
-	txt += "END ELEMENTS\r\n";
-	
-	txt += "CONSTUCTS\r\n"
+	txt += "END ELEMENTS\r\n\r\n";
+	//format constructs
+	txt += "CONSTRUCTS\r\n"
 	for (var row = 1; row < numRow; row++) {
-		txt += table.rows[row].cells[0].innerHTML + " : " + table.rows[row].cells[table.rows[row].cells.length - 1].innerHTML + "\r\n";
+		txt += `${table.rows[row].cells[0].innerHTML} : ${table.rows[row].cells[numCol - 1].innerHTML}\r\n`;
 	}
-	txt += "END CONSTRUCTS\r\n"
-	
+	txt += "END CONSTRUCTS\r\n\r\n"
+	//format ratings
 	txt += "RATINGS\r\n"
 	for (var row = 1; row < numRow; row++) {
 		for (var col = 1; col < numCol - 1; col++) {
-			txt += table.rows[row].cells[col].innerHTML;
-			txt += col < numCol - 2 ? " " : "";
+			txt += `${table.rows[row].cells[col].innerHTML}${col < numCol - 2 ? " " : "\r\n"}`; //add ratings and if at not at end of line then space
 		}
-		txt += "\r\n";
 	}
 	txt += "END RATINGS\r\n"
 	
 	var blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
 	saveAs(blob, "repGrid.txt");
+}
+
+function exportToORG() {
+	var table = document.getElementById("repGrid");
+	
+	numRow = table.rows.length;
+	numCol = table.rows[0].cells.length;
+	
+	var cp = new String;
+	cp += "args <- list(<br>";
+	cp += "name= c(";
+	for (var col = 1; col < numCol - 1; col++) {
+		cp += `"${table.rows[0].cells[col].innerHTML}"${col < numCol - 2 ? ", " : "),<br>"}`;
+	}
+	cp += "l.name= c("
+	for (var row = 1; row < numRow; row++) {
+		cp += `"${table.rows[row].cells[0].innerHTML}"${row < numRow - 1 ? ", " : "),<br>"}`;
+	}
+	cp += "r.name= c("
+	for (var row = 1; row < numRow; row++) {
+		cp += `"${table.rows[row].cells[numCol - 1].innerHTML}"${row < numRow - 1 ? ", " : "),<br>"}`;
+	}
+	cp += "scores=c (";
+	for (var row = 1; row < numRow; row++) {
+		for (var col = 1; col < numCol - 1; col++) {
+			cp += table.rows[row].cells[col].innerHTML;
+			if (col < numCol - 2) { //if not end of line, space
+				cp += ", ";
+			}
+			else if (row < numRow - 1) { //if end of line but not last line, break
+				cp += ",<br>";
+			}
+		}
+	}
+	cp +=`))<br>newGrid <- makeRepgrid(args)<br>newGrid <- setScale(newGrid, ${table.rows[0].cells[0].innerHTML}, ${table.rows[0].cells[numCol - 1].innerHTML})<br>newGrid`;
+	document.write(cp);
 }
