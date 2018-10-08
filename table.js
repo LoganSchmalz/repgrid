@@ -84,21 +84,21 @@ function exportToTXT() {
 	txt += `RANGE\r\n${table.rows[0].cells[0].innerHTML} ${table.rows[0].cells[numCol - 1].innerHTML}\r\nEND RANGE\r\n\r\n`;
 	//format elements
 	txt += "ELEMENTS\r\n"
-	for (var col = 1; col < numCol - 1; col++) {
-		txt += `${table.rows[0].cells[col].innerHTML}\r\n`;
+	for (var i = 1; i < numCol - 1; i++) {
+		txt += `${table.rows[0].cells[i].innerHTML}\r\n`;
 	}
 	txt += "END ELEMENTS\r\n\r\n";
 	//format constructs
 	txt += "CONSTRUCTS\r\n"
-	for (var row = 1; row < numRow; row++) {
-		txt += `${table.rows[row].cells[0].innerHTML} : ${table.rows[row].cells[numCol - 1].innerHTML}\r\n`;
+	for (var i = 1; i < numRow; i++) {
+		txt += `${table.rows[i].cells[0].innerHTML} : ${table.rows[i].cells[numCol - 1].innerHTML}\r\n`;
 	}
 	txt += "END CONSTRUCTS\r\n\r\n"
 	//format ratings
 	txt += "RATINGS\r\n"
-	for (var row = 1; row < numRow; row++) {
-		for (var col = 1; col < numCol - 1; col++) {
-			txt += `${table.rows[row].cells[col].innerHTML}${col < numCol - 2 ? " " : "\r\n"}`; //add ratings and if at not at end of line then space
+	for (var i = 1; i < numRow; i++) {
+		for (var j = 1; j < numCol - 1; j++) {
+			txt += `${table.rows[i].cells[j].innerHTML}${j < numCol - 2 ? " " : "\r\n"}`; //add ratings and if at not at end of line then space
 		}
 	}
 	txt += "END RATINGS\r\n"
@@ -116,25 +116,25 @@ function exportToORG() {
 	var cp = new String;
 	cp += "args <- list(<br>";
 	cp += "name= c(";
-	for (var col = 1; col < numCol - 1; col++) {
-		cp += `"${table.rows[0].cells[col].innerHTML}"${col < numCol - 2 ? ", " : "),<br>"}`;
+	for (var i = 1; i < numCol - 1; i++) {
+		cp += `"${table.rows[0].cells[i].innerHTML}"${i < numCol - 2 ? ", " : "),<br>"}`;
 	}
 	cp += "l.name= c("
-	for (var row = 1; row < numRow; row++) {
-		cp += `"${table.rows[row].cells[0].innerHTML}"${row < numRow - 1 ? ", " : "),<br>"}`;
+	for (var i = 1; i < numRow; i++) {
+		cp += `"${table.rows[i].cells[0].innerHTML}"${i < numRow - 1 ? ", " : "),<br>"}`;
 	}
 	cp += "r.name= c("
-	for (var row = 1; row < numRow; row++) {
-		cp += `"${table.rows[row].cells[numCol - 1].innerHTML}"${row < numRow - 1 ? ", " : "),<br>"}`;
+	for (var i = 1; i < numRow; i++) {
+		cp += `"${table.rows[i].cells[numCol - 1].innerHTML}"${i < numRow - 1 ? ", " : "),<br>"}`;
 	}
 	cp += "scores=c (";
-	for (var row = 1; row < numRow; row++) {
-		for (var col = 1; col < numCol - 1; col++) {
-			cp += table.rows[row].cells[col].innerHTML;
-			if (col < numCol - 2) { //if not end of line, space
+	for (var i = 1; i < numRow; i++) {
+		for (var j = 1; j < numCol - 1; j++) {
+			cp += table.rows[i].cells[j].innerHTML;
+			if (j < numCol - 2) { //if not end of line, space
 				cp += ", ";
 			}
-			else if (row < numRow - 1) { //if end of line but not last line, break
+			else if (i < numRow - 1) { //if end of line but not last line, break
 				cp += ",<br>";
 			}
 		}
