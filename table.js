@@ -1,9 +1,30 @@
-function createRow() {
-	var rowLabel = document.getElementById("rowLabel");
+function generateTable() {
+	var tableDiv = document.getElementById("tableDiv");
+	var table = document.createElement("table");
+	table.id = "repGrid";
+	tableDiv.appendChild(table);
+	
+	var ratingL = document.getElementById("ratingL").value;
+	var ratingR = document.getElementById("ratingR").value;
+	var row = table.insertRow(-1);
+	var ratingCell = document.createElement("td");
+	ratingCell.innerHTML = ratingL;
+	ratingCell.contentEditable = true;
+	row.appendChild(ratingCell);
+	ratingCell = document.createElement("td");
+	ratingCell.innerHTML = ratingR;
+	ratingCell.contentEditable = true;
+	row.appendChild(ratingCell);
+
+	createColumn("test", table);
+}
+
+function createRow(rowLabel, notRowLabel, table) {
+	//var rowLabel = document.getElementById("rowLabel");
 	var label = rowLabel.value; //get input
 	
 	if (label != "") {
-		var table = document.getElementById("repGrid");
+		//var table = document.getElementById("repGrid");
 		var row = table.insertRow(-1);
 		
 		var headerCell = document.createElement("th"); //create left side
@@ -18,7 +39,12 @@ function createRow() {
 		}
 		
 		headerCell = document.createElement("th"); //must create new element to make new object
+		if (notRowLabel) {
+			headerCell.innerHTML = notRowLabel.value;
+		}
+		else {
 		headerCell.innerHTML = "Not " + label; //make the not-construct on the right side
+		}
 		headerCell.contentEditable = "true";
 		row.appendChild(headerCell);
 		
@@ -26,12 +52,12 @@ function createRow() {
 	}
 }
 
-function createColumn() {
-	var columnLabel = document.getElementById("columnLabel");
+function createColumn(columnLabel, table) {
+	//var columnLabel = document.getElementById("columnLabel");
 	var label = columnLabel.value; //get input
 	
-	if (label != "") {
-		var table = document.getElementById("repGrid");
+	if (label != "a") {
+		//var table = document.getElementById("repGrid");
 		var columnNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
 		
 		var headerCell = document.createElement("th"); //create construct label

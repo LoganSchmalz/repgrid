@@ -2,14 +2,46 @@
 <html>
 <head>
 	<link rel="stylesheet" href="style.css">
-	<script src="table.js"></script>
+	<script type="text/javascript" src="xlsx.core.min.js"></script>
+	<script type="text/javascript" src="FileSaver.min.js"></script>
+	<script type="text/javascript" src="table.js"></script>
+	<script type="text/javascript" src="tableexport.min.js"></script>
 </head>
 <body>
 	Topic: <input type="text"><br>
+	Rating: <input id="ratingL" type="text"> - <input id="ratingR" type="text"><br>
 	Elements: <textarea id="elements"></textarea><br>
 	Constructs: <textarea id="constructs"></textarea><br>
 	Not Constructs: <textarea id="constructs"></textarea><br>
+	<button type="button" onclick="generateTable();">Generate Table</button><br>
 	
-	<a href="table.html">Go To Table</a>
+	<div id="tableDiv">
+	</div>
+	<div style="float:left">
+		<table id="repGrid"><tbody>
+			<tr>
+				<td contenteditable="true">1</td>
+				<th contenteditable="true">Element1</th>
+				<th contenteditable="true">Element2</th>
+				<td contenteditable="true">7</td>
+			</tr>
+			<tr>
+				<th contenteditable="true">Construct1</th>
+				<td contenteditable="true"></td>
+				<td contenteditable="true"></td>
+				<th contenteditable="true">Not Construct1</th>
+			</tr>
+		</tbody></table>
+		<input type="text" id="rowLabel">
+		<button type="button" id="row" onclick="createRow();">+</button>
+		<a onclick="removeRow();" href="#">Delete Row</a>
+	</div>
+	<input type="text" id="columnLabel">
+	<button type="button" id="column" onclick="createColumn();">+</button>
+	<a onclick="removeColumn();" href="#">Delete Column</a>
+
+	<button type="button" onclick="exportToXLSX();">Export to .xlsx</button>
+	<button type="button" onclick="exportToTXT();">Export to .txt</button>
+	<button type="button" onclick="exportToORG();">Copy to OpenRepGrid</button>
 </body>
 </html>
