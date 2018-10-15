@@ -2,8 +2,10 @@ function generateTable() {
 	var tableDiv = document.getElementById("tableDiv");
 	var table = document.createElement("table");
 	table.id = "repGrid";
+	table.style = "float: left";
 	tableDiv.appendChild(table);
 	
+	//create rating cells
 	var ratingL = document.getElementById("ratingL").value;
 	var ratingR = document.getElementById("ratingR").value;
 	var row = table.insertRow(-1);
@@ -16,19 +18,61 @@ function generateTable() {
 	ratingCell.contentEditable = true;
 	row.appendChild(ratingCell);
 
-	createColumn("test", table);
+	//create rest of table
+	//for (var i = 0; i <) {
+	//	createColumn("test", table);
+	//}
+	
+	//for (var i = 0; i<) {
+	//	createRow("test", "not test", table);
+	//}
+	
+	var rowLeftInput = document.createElement("input");
+	rowLeftInput.type = "text";
+	rowLeftInput.id = "inputRowLeft";
+	tableDiv.appendChild(rowLeftInput);
+	
+	var rowRightInput = document.createElement("input");
+	rowLeftInput.type = "text";
+	rowLeftInput.id = "inputRowRight";
+	tableDiv.appendChild(rowRightInput);
+	
+	var newRowButton = document.createElement("button");
+	newRowButton.innerHTML = "+";
+	newRowButton.onclick = function() {createRow(rowLeftInput, rowRightInput);};
+	tableDiv.appendChild(newRowButton);
+	
+	var newColumnButton = document.createElement("button");
+	newColumnButton.innerHTML = "+";
+	document.body.appendChild(newColumnButton);
+	newColumnButton.onclick = function() {createColumn();};
+
+	var exportToXLSXButton = document.createElement("button");
+	exportToXLSXButton.innerHTML = "Export to Excel";
+	exportToXLSXButton.addEventListener("click", exportToXLSX);
+	document.body.appendChild(exportToXLSXButton);
+	
+	var exportToTXTButton = document.createElement("button");
+	exportToTXTButton.innerHTML = "Export to text file";
+	exportToTXTButton.addEventListener("click", exportToTXT);
+	document.body.appendChild(exportToTXTButton);
+	
+	var exportToORGButton = document.createElement("button");
+	exportToORGButton.innerHTML = "Copy to OpenRepGrid";
+	exportToORGButton.addEventListener("click", exportToORG);
+	document.body.appendChild(exportToORGButton);
 }
 
-function createRow(rowLabel, notRowLabel, table) {
-	//var rowLabel = document.getElementById("rowLabel");
-	var label = rowLabel.value; //get input
+function createRow(inputLeft, inputRight) {
+	var leftLabel = inputLeft.value; //get input
+	var rightLabel = inputRight.value;
 	
-	if (label != "") {
-		//var table = document.getElementById("repGrid");
+	if (leftLabel != "") {
+		var table = document.getElementById("repGrid");
 		var row = table.insertRow(-1);
 		
 		var headerCell = document.createElement("th"); //create left side
-		headerCell.innerHTML = label;
+		headerCell.innerHTML = leftLabel;
 		headerCell.contentEditable = "true";
 		row.appendChild(headerCell);
 		
@@ -38,26 +82,22 @@ function createRow(rowLabel, notRowLabel, table) {
 			row.appendChild(inputCell);
 		}
 		
-		headerCell = document.createElement("th"); //must create new element to make new object
-		if (notRowLabel) {
-			headerCell.innerHTML = notRowLabel.value;
-		}
-		else {
-		headerCell.innerHTML = "Not " + label; //make the not-construct on the right side
-		}
+		headerCell = document.createElement("th"); //create right side
+		headerCell.innerHTML = rightLabel;
 		headerCell.contentEditable = "true";
 		row.appendChild(headerCell);
 		
-		rowLabel.value = ""; //clear input
+		inputLeft.value = ""; //clear input
+		inputRight.value = "";
 	}
 }
 
-function createColumn(columnLabel, table) {
-	//var columnLabel = document.getElementById("columnLabel");
+function createColumn() {
+	var columnLabel = document.getElementById("columnLabel");
 	var label = columnLabel.value; //get input
 	
 	if (label != "a") {
-		//var table = document.getElementById("repGrid");
+		var table = document.getElementById("repGrid");
 		var columnNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
 		
 		var headerCell = document.createElement("th"); //create construct label
