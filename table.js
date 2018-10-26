@@ -2,7 +2,6 @@ function generateTable() {
 	var tableDiv = document.getElementById("tableDiv");
 	var table = document.createElement("table");
 	table.id = "repGrid";
-	table.style = "float: left";
 	tableDiv.appendChild(table);
 	
 	//create rating cells
@@ -19,7 +18,6 @@ function generateTable() {
 	row.appendChild(ratingCell);
 
 	//create rest of table
-<<<<<<< HEAD
 	var colLabels = document.getElementById("elements").value.split(",");
 	if (colLabels[0] == "") { colLabels[0] = "Element1"; } //default element
 	for (var i = 0; i < colLabels.length; i++) {
@@ -36,7 +34,6 @@ function generateTable() {
 	
 	createButtonsAndInputs();
 	document.getElementById("buttons").removeChild(document.getElementById("generate"));
-	
 	document.getElementById("input").removeChild(document.getElementById("form1"));
 }
 
@@ -49,55 +46,6 @@ function createRow(inputLeft, inputRight) {
 	if (typeof rightLabel != 'string') {
 		rightLabel = rightLabel.value;
 	}
-=======
-	//for (var i = 0; i <) {
-	//	createColumn("test", table);
-	//}
-	
-	//for (var i = 0; i<) {
-	//	createRow("test", "not test", table);
-	//}
-	
-	var rowLeftInput = document.createElement("input");
-	rowLeftInput.type = "text";
-	rowLeftInput.id = "inputRowLeft";
-	tableDiv.appendChild(rowLeftInput);
-	
-	var rowRightInput = document.createElement("input");
-	rowLeftInput.type = "text";
-	rowLeftInput.id = "inputRowRight";
-	tableDiv.appendChild(rowRightInput);
-	
-	var newRowButton = document.createElement("button");
-	newRowButton.innerHTML = "+";
-	newRowButton.onclick = function() {createRow(rowLeftInput, rowRightInput);};
-	tableDiv.appendChild(newRowButton);
-	
-	var newColumnButton = document.createElement("button");
-	newColumnButton.innerHTML = "+";
-	document.body.appendChild(newColumnButton);
-	newColumnButton.onclick = function() {createColumn();};
-
-	var exportToXLSXButton = document.createElement("button");
-	exportToXLSXButton.innerHTML = "Export to Excel";
-	exportToXLSXButton.addEventListener("click", exportToXLSX);
-	document.body.appendChild(exportToXLSXButton);
-	
-	var exportToTXTButton = document.createElement("button");
-	exportToTXTButton.innerHTML = "Export to text file";
-	exportToTXTButton.addEventListener("click", exportToTXT);
-	document.body.appendChild(exportToTXTButton);
-	
-	var exportToORGButton = document.createElement("button");
-	exportToORGButton.innerHTML = "Copy to OpenRepGrid";
-	exportToORGButton.addEventListener("click", exportToORG);
-	document.body.appendChild(exportToORGButton);
-}
-
-function createRow(inputLeft, inputRight) {
-	var leftLabel = inputLeft.value; //get input
-	var rightLabel = inputRight.value;
->>>>>>> c6445eeb0cbb57845736d6a0f087bed90ec20928
 	
 	if (leftLabel != "") {
 		var table = document.getElementById("repGrid");
@@ -111,6 +59,7 @@ function createRow(inputLeft, inputRight) {
 		for (var i = 1; i < table.rows[0].cells.length - 1; i++) { //make input for every cell other than ends
 			var inputCell = document.createElement("td");
 			inputCell.contentEditable = "true";
+			inputCell.onkeypress = "return testCharacter(event);"
 			row.appendChild(inputCell);
 		}
 		
@@ -124,26 +73,16 @@ function createRow(inputLeft, inputRight) {
 	}
 }
 
-<<<<<<< HEAD
 function createColumn(input) {
 	//var columnLabel = document.getElementById("columnLabel");
 	var label = input; //get input
 	if (typeof label != 'string') {
 		label = label.value;
 	}
-	
-	if (label != "a") {
+		
+	if (label != "") {
 		var table = document.getElementById("repGrid");
 		var colNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
-=======
-function createColumn() {
-	var columnLabel = document.getElementById("columnLabel");
-	var label = columnLabel.value; //get input
-	
-	if (label != "a") {
-		var table = document.getElementById("repGrid");
-		var columnNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
->>>>>>> c6445eeb0cbb57845736d6a0f087bed90ec20928
 		
 		var headerCell = document.createElement("th"); //create construct label
 		headerCell.innerHTML = label;
@@ -153,6 +92,7 @@ function createColumn() {
 		for (var i = 1; i < table.rows.length; i++) { //make input for eveyr other cell in column
 			var inputCell = document.createElement("td");
 			inputCell.contentEditable = "true";
+			inputCell.onkeypress = "return testCharacter(event);"
 			table.rows[i].insertBefore(inputCell, table.rows[i].cells[colNum]); //again, instert before last column
 		}
 	}
@@ -160,15 +100,25 @@ function createColumn() {
 	input.value = ""; //clear input
 }
 
+function testCharacter(event) {
+	if ((event.keyCode >= 48 && event.keyCode <= 57) || event.keyCode === 13) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 function createButtonsAndInputs() {
+	var tableDiv = document.getElementById("tableDiv");
+	
 	var rowLeftInput = document.createElement("input");
 	rowLeftInput.type = "text";
 	rowLeftInput.id = "rowLeftInput";
 	tableDiv.appendChild(rowLeftInput);
 	
 	var rowRightInput = document.createElement("input");
-	rowLeftInput.type = "text";
-	rowLeftInput.id = "rowRightInput";
+	rowRightInput.type = "text";
+	rowRightInput.id = "rowRightInput";
 	tableDiv.appendChild(rowRightInput);
 	
 	var newRowButton = document.createElement("button");
