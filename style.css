@@ -4,5 +4,15 @@ table {
 }
 
 td, th {
+	min-width: 16px;
     border: 1px solid black;
+}
+
+#ratingL, #ratingR {
+	width: 24px;
+}
+
+footer {
+	position: fixed;
+	bottom: 0px;
 }

@@ -8,16 +8,24 @@
 	<script type="text/javascript" src="tableexport.min.js"></script>
 </head>
 <body>
-	Topic: <input type="text"><br>
-	Rating: <input id="ratingL" type="text"> - <input id="ratingR" type="text"><br>
-	Elements: <textarea id="elements"></textarea><br>
-	Constructs: <textarea id="constructs"></textarea><br>
-	Not Constructs: <textarea id="constructs"></textarea><br>
-	<button type="button" onclick="generateTable();">Generate Table</button><br>
-	
-	<div id="tableDiv">
+	<div id="input">
+	<form action="" onsubmit="generateTable(); return false;" id="form1">
+		Topic: <input type="text"><br>
+		Rating: <input id="ratingL" type="text" value="1" required> - <input id="ratingR" type="text" value="7" required><br>
+		Elements:<br><textarea id="elements">Element1, Element2, Element3</textarea><br>
+		Constructs:<br><textarea id="constructs">Construct1, Construct2, Construct3</textarea><br>
+		Not Constructs:<br><textarea id="not-constructs">Not Construct1, Not Construct2, Not Construct3</textarea><br>
+	</form>
 	</div>
+<<<<<<< HEAD
+	<div id="buttons">
+		<button id="generate" type="submit" form="form1" value="Submit">Generate Table</button>
+	</div><br>
+	
+	<div id="tableDiv" style="float:left"></div>
+=======
 	<div style="float:left">
+>>>>>>> c6445eeb0cbb57845736d6a0f087bed90ec20928
 	<!--<table id="repGrid"><tbody>
 			<tr>
 				<td contenteditable="true">1</td>
@@ -43,5 +51,9 @@
 	<button type="button" onclick="exportToXLSX();">Export to .xlsx</button>
 	<button type="button" onclick="exportToTXT();">Export to .txt</button>
 	<button type="button" onclick="exportToORG();">Copy to OpenRepGrid</button>-->
+<<<<<<< HEAD
+	<footer>Contact: loganschmalz@gmail.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://openrepgrid.org/">OpenRepGrid</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using FileSaver, SheetJS, and TableExport</footer>
+=======
+>>>>>>> c6445eeb0cbb57845736d6a0f087bed90ec20928
 </body>
 </html>

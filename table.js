@@ -19,6 +19,37 @@ function generateTable() {
 	row.appendChild(ratingCell);
 
 	//create rest of table
+<<<<<<< HEAD
+	var colLabels = document.getElementById("elements").value.split(",");
+	if (colLabels[0] == "") { colLabels[0] = "Element1"; } //default element
+	for (var i = 0; i < colLabels.length; i++) {
+		createColumn(colLabels[i].trim());
+	}
+	
+	var leftLabels = document.getElementById("constructs").value.split(",");
+	if (leftLabels[0] == "") { leftLabels[0] = "Construct1"; } //default construct
+	var rightLabels = document.getElementById("not-constructs").value.split(",");
+	for (var i = 0; i < leftLabels.length; i++) {
+		if (rightLabels[i] == "") { rightLabels[i] = `Not ${leftLabels[i]}`; }
+		createRow(leftLabels[i].trim(), rightLabels[i].trim());
+	}
+	
+	createButtonsAndInputs();
+	document.getElementById("buttons").removeChild(document.getElementById("generate"));
+	
+	document.getElementById("input").removeChild(document.getElementById("form1"));
+}
+
+function createRow(inputLeft, inputRight) {
+	var leftLabel = inputLeft; //get input
+	if (typeof leftLabel != 'string') {
+		leftLabel = leftLabel.value;
+	}
+	var rightLabel = inputRight;
+	if (typeof rightLabel != 'string') {
+		rightLabel = rightLabel.value;
+	}
+=======
 	//for (var i = 0; i <) {
 	//	createColumn("test", table);
 	//}
@@ -66,6 +97,7 @@ function generateTable() {
 function createRow(inputLeft, inputRight) {
 	var leftLabel = inputLeft.value; //get input
 	var rightLabel = inputRight.value;
+>>>>>>> c6445eeb0cbb57845736d6a0f087bed90ec20928
 	
 	if (leftLabel != "") {
 		var table = document.getElementById("repGrid");
@@ -92,6 +124,18 @@ function createRow(inputLeft, inputRight) {
 	}
 }
 
+<<<<<<< HEAD
+function createColumn(input) {
+	//var columnLabel = document.getElementById("columnLabel");
+	var label = input; //get input
+	if (typeof label != 'string') {
+		label = label.value;
+	}
+	
+	if (label != "a") {
+		var table = document.getElementById("repGrid");
+		var colNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
+=======
 function createColumn() {
 	var columnLabel = document.getElementById("columnLabel");
 	var label = columnLabel.value; //get input
@@ -99,20 +143,66 @@ function createColumn() {
 	if (label != "a") {
 		var table = document.getElementById("repGrid");
 		var columnNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
+>>>>>>> c6445eeb0cbb57845736d6a0f087bed90ec20928
 		
 		var headerCell = document.createElement("th"); //create construct label
 		headerCell.innerHTML = label;
 		headerCell.contentEditable = "true";
-		table.rows[0].insertBefore(headerCell, table.rows[0].cells[columnNum]); //inserts before the last column (last column is ratings/not-constructs)
+		table.rows[0].insertBefore(headerCell, table.rows[0].cells[colNum]); //inserts before the last column (last column is ratings/not-constructs)
 				
 		for (var i = 1; i < table.rows.length; i++) { //make input for eveyr other cell in column
 			var inputCell = document.createElement("td");
 			inputCell.contentEditable = "true";
-			table.rows[i].insertBefore(inputCell, table.rows[i].cells[columnNum]); //again, instert before last column
+			table.rows[i].insertBefore(inputCell, table.rows[i].cells[colNum]); //again, instert before last column
 		}
 	}
 	
-	columnLabel.value = ""; //clear input
+	input.value = ""; //clear input
+}
+
+function createButtonsAndInputs() {
+	var rowLeftInput = document.createElement("input");
+	rowLeftInput.type = "text";
+	rowLeftInput.id = "rowLeftInput";
+	tableDiv.appendChild(rowLeftInput);
+	
+	var rowRightInput = document.createElement("input");
+	rowLeftInput.type = "text";
+	rowLeftInput.id = "rowRightInput";
+	tableDiv.appendChild(rowRightInput);
+	
+	var newRowButton = document.createElement("button");
+	newRowButton.innerHTML = "+";
+	newRowButton.onclick = function() {createRow(rowLeftInput, rowRightInput);};
+	tableDiv.appendChild(newRowButton);
+	
+	var colInput = document.createElement("input");
+	colInput.type = "text";
+	colInput.id = "colInput";
+	document.body.appendChild(colInput);
+	
+	var newColButton = document.createElement("button");
+	newColButton.innerHTML = "+";
+	document.body.appendChild(newColButton);
+	newColButton.onclick = function() {createColumn(colInput);};
+
+	//generate export buttons
+	var buttonDiv = document.getElementById("buttons"); //replace Generate Table button with these
+	//excel
+	var exportToXLSXButton = document.createElement("button");
+	exportToXLSXButton.innerHTML = "Export to Excel";
+	exportToXLSXButton.addEventListener("click", exportToXLSX);
+	buttonDiv.appendChild(exportToXLSXButton);
+	//txt
+	var exportToTXTButton = document.createElement("button");
+	exportToTXTButton.innerHTML = "Export to text file";
+	exportToTXTButton.addEventListener("click", exportToTXT);
+	buttonDiv.appendChild(exportToTXTButton);
+	//OpenRepGrid
+	var exportToORGButton = document.createElement("button");
+	exportToORGButton.innerHTML = "Copy to OpenRepGrid";
+	exportToORGButton.addEventListener("click", exportToORG);
+	buttonDiv.appendChild(exportToORGButton);
 }
 
 function removeRow() {
@@ -180,31 +270,35 @@ function exportToORG() {
 	numCol = table.rows[0].cells.length;
 	
 	var cp = new String;
-	cp += "args <- list(<br>";
-	cp += "name= c(";
+	cp += `args <- list(<br>`;
+	cp += `name= c(`;
 	for (var i = 1; i < numCol - 1; i++) {
 		cp += `"${table.rows[0].cells[i].innerHTML}"${i < numCol - 2 ? ", " : "),<br>"}`;
 	}
-	cp += "l.name= c("
+	cp += `l.name= c(`
 	for (var i = 1; i < numRow; i++) {
 		cp += `"${table.rows[i].cells[0].innerHTML}"${i < numRow - 1 ? ", " : "),<br>"}`;
 	}
-	cp += "r.name= c("
+	cp += `r.name= c(`
 	for (var i = 1; i < numRow; i++) {
 		cp += `"${table.rows[i].cells[numCol - 1].innerHTML}"${i < numRow - 1 ? ", " : "),<br>"}`;
 	}
-	cp += "scores=c (";
+	cp += `scores=c (`;
 	for (var i = 1; i < numRow; i++) {
 		for (var j = 1; j < numCol - 1; j++) {
 			cp += table.rows[i].cells[j].innerHTML;
 			if (j < numCol - 2) { //if not end of line, space
-				cp += ", ";
+				cp += `, `;
 			}
 			else if (i < numRow - 1) { //if end of line but not last line, break
-				cp += ",<br>";
+				cp += `,<br>`;
 			}
 		}
 	}
 	cp +=`))<br>newGrid <- makeRepgrid(args)<br>newGrid <- setScale(newGrid, ${table.rows[0].cells[0].innerHTML}, ${table.rows[0].cells[numCol - 1].innerHTML})<br>newGrid`;
 	document.write(cp);
+}
+
+function importFromXLSX() {
+	var table = document.getElementById("repGrid");
 }
