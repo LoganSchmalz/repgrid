@@ -223,15 +223,15 @@ function exportToORG() {
 	cp += `args <- list(<br>`;
 	cp += `name= c(`;
 	for (var i = 1; i < numCol - 1; i++) {
-		cp += `"${table.rows[0].cells[i].innerHTML}"${i < numCol - 2 ? ", " : "),<br>"}`;
+		cp += `'${table.rows[0].cells[i].innerHTML}'${i < numCol - 2 ? ", " : "),<br>"}`;
 	}
 	cp += `l.name= c(`
 	for (var i = 1; i < numRow; i++) {
-		cp += `"${table.rows[i].cells[0].innerHTML}"${i < numRow - 1 ? ", " : "),<br>"}`;
+		cp += `'${table.rows[i].cells[0].innerHTML}'${i < numRow - 1 ? ", " : "),<br>"}`;
 	}
 	cp += `r.name= c(`
 	for (var i = 1; i < numRow; i++) {
-		cp += `"${table.rows[i].cells[numCol - 1].innerHTML}"${i < numRow - 1 ? ", " : "),<br>"}`;
+		cp += `'${table.rows[i].cells[numCol - 1].innerHTML}'${i < numRow - 1 ? ", " : "),<br>"}`;
 	}
 	cp += `scores=c (`;
 	for (var i = 1; i < numRow; i++) {
