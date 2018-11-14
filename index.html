@@ -12,18 +12,19 @@
 	<form action="" onsubmit="generateTable(); return false;" id="form1">
 		Topic: <input type="text"><br>
 		Rating: <input id="ratingL" type="text" value="1" required> - <input id="ratingR" type="text" value="7" required><br>
-		Elements:<br><textarea id="elements">Element1, Element2, Element3</textarea><br>
-		Constructs:<br><textarea id="constructs">Construct1, Construct2, Construct3</textarea><br>
-		Not Constructs:<br><textarea id="not-constructs">Not Construct1, Not Construct2, Not Construct3</textarea><br>
+		Elements:<br><textarea id="elements">Element 1, Element 2, Element 3</textarea><br>
+		Constructs:<br><textarea id="constructs">Construct 1, Construct 2, Construct 3</textarea><br>
+		Not Constructs:<br><textarea id="not-constructs">Not Construct 1, Not Construct 2, Not Construct 3</textarea><br>
 	</form>
 	</div>
-	<div id="buttons">
+	<div id="buttonDiv">
 		<button id="generate" type="submit" form="form1" value="Submit">Generate Table</button>
 	</div><br>
 	
 	<div id="tableDiv" style="float:left">
-	
 	</div>
+	
+	<button id="ajaxButton">AJAX</button>
 	<!--<div style="float:left">
 		<table id="repGrid"><tbody>
 			<tr>
@@ -45,11 +46,64 @@
 	</div>
 	<input type="text" id="columnLabel">
 	<button type="button" id="column" onclick="createColumn();">+</button>
-	<a onclick="removeColumn();" href="#">Delete Column</a>
-
-	<button type="button" onclick="exportToXLSX();">Export to .xlsx</button>
-	<button type="button" onclick="exportToTXT();">Export to .txt</button>
-	<button type="button" onclick="exportToORG();">Copy to OpenRepGrid</button>-->
+	<a onclick="removeColumn();" href="#">Delete Column</a>-->
 	<footer>Contact: loganschmalz@gmail.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://openrepgrid.org/">OpenRepGrid</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using FileSaver, SheetJS, and TableExport</footer>
 </body>
+
+<script>
+	document.getElementById("ajaxButton").onclick = function() {
+		var table = document.getElementById("repGrid");	
+		var numRow = table.rows.length;
+		var numCol = table.rows[0].cells.length;
+		var elements = new Array();
+		for (var i = 1; i < numCol - 1; i++) {
+			elements.push(table.rows[0].cells[i].innerHTML);
+		}
+		var constructs = new Array();
+		for (var i = 1; i < numRow; i++) {
+			constructs.push(table.rows[i].cells[0].innerHTML);
+		}
+		var notconstructs = new Array();
+		for (var i = 1; i < numRow; i++) {
+			notconstructs.push(table.rows[i].cells[numCol - 1].innerHTML);
+		}
+		var scores = new Array();
+		for (var i = 1; i < numRow; i++) {
+			for (var j = 1; j < numCol - 1; j++) {
+				scores.push(table.rows[i].cells[j].innerHTML);
+			}
+		}
+		var ratingL = table.rows[0].cells[0].innerHTML;
+		var ratingR = table.rows[0].cells[numCol - 1].innerHTML;
+		makeRequest("plotscript.php", elements, constructs, notconstructs, scores, ratingL, ratingR);
+	};
+	
+	function makeRequest(url, elements, constructs, notconstructs, scores, ratingL, ratingR)	{
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		var data = 'elements=' + encodeURIComponent(elements)
+		         + '&constructs=' + encodeURIComponent(constructs)
+				 + '&notconstructs=' + encodeURIComponent(notconstructs)
+				 + '&scores=' + encodeURIComponent(scores)
+				 + '&ratingL=' + encodeURIComponent(ratingL)
+				 + '&ratingR=' + encodeURIComponent(ratingR);
+		
+		xhr.send(data);
+	
+		xhr.onreadystatechange = function() {		
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					console.log("AJAX success");
+				}
+				else {
+					console.log("AJAX err");
+				}
+			}
+		};
+	}
+</script>
+
+
 </html>

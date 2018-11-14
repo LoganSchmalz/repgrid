@@ -1,22 +1,18 @@
 function generateTable() {
 	var tableDiv = document.getElementById("tableDiv");
-	var table = document.createElement("table");
-	table.id = "repGrid";
-	tableDiv.appendChild(table);
-	
-	//create rating cells
-	var ratingL = document.getElementById("ratingL").value;
-	var ratingR = document.getElementById("ratingR").value;
-	var row = table.insertRow(-1);
-	var ratingCell = document.createElement("td");
-	ratingCell.innerHTML = ratingL;
-	ratingCell.contentEditable = true;
-	row.appendChild(ratingCell);
-	ratingCell = document.createElement("td");
-	ratingCell.innerHTML = ratingR;
-	ratingCell.contentEditable = true;
-	row.appendChild(ratingCell);
-
+	var buttonDiv = document.getElementById("buttonDiv");
+	//buttonDiv.innerHTML = `<button onclick="exportToXLSX">Export to Excel</button><button onclick="exportToTXT">Export to text file</button><button onclick="exportToORG">Copy to OpenRepGrid</button>`;
+	tableDiv.innerHTML = `
+		<table id="repGrid"><tbody>
+			<tr>
+				<td contenteditable="true">${document.getElementById("ratingL").value}</td>
+				<td contenteditable="true">${document.getElementById("ratingR").value}</td>
+			</tr>
+		</tbody></table>`;
+		//<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput"><button id="addConstruct");">+</button>
+		//<a onclick="removeRow();" href="">Delete Construct</a>`;
+	//tableDiv.insertAdjacentHTML("afterend", `<input type="text" id="colInput"><button id="addElement");">+</button>
+	//<a onclick="removeColumn();" href="">Delete Element</a>`);
 	//create rest of table
 	var colLabels = document.getElementById("elements").value.split(",");
 	if (colLabels[0] == "") { colLabels[0] = "Element1"; } //default element
@@ -33,8 +29,8 @@ function generateTable() {
 	}
 	
 	createButtonsAndInputs();
-	document.getElementById("buttons").removeChild(document.getElementById("generate"));
-	document.getElementById("input").removeChild(document.getElementById("form1"));
+	//document.getElementById("buttonDiv").removeChild(document.getElementById("generate"));
+	document.body.removeChild(document.getElementById("input"));
 }
 
 function createRow(inputLeft, inputRight) {
@@ -74,9 +70,15 @@ function createRow(inputLeft, inputRight) {
 }
 
 function createColumn(input) {
+	//console.log(input);
+	if (document.getElementById("colInput")) {
+		input = document.getElementById("colInput");
+		console.log(document.getElementById("colInput").value);//input = document.getElementById("colInput").value;
+		}
 	//var columnLabel = document.getElementById("columnLabel");
 	var label = input; //get input
 	if (typeof label != 'string') {
+		console.log("test");
 		label = label.value;
 	}
 		
@@ -111,33 +113,43 @@ function testCharacter(event) {
 function createButtonsAndInputs() {
 	var tableDiv = document.getElementById("tableDiv");
 	
+	//construct input
 	var rowLeftInput = document.createElement("input");
 	rowLeftInput.type = "text";
 	rowLeftInput.id = "rowLeftInput";
 	tableDiv.appendChild(rowLeftInput);
-	
 	var rowRightInput = document.createElement("input");
 	rowRightInput.type = "text";
 	rowRightInput.id = "rowRightInput";
 	tableDiv.appendChild(rowRightInput);
-	
 	var newRowButton = document.createElement("button");
 	newRowButton.innerHTML = "+";
 	newRowButton.onclick = function() {createRow(rowLeftInput, rowRightInput);};
 	tableDiv.appendChild(newRowButton);
+	var delRowLink = document.createElement("a");
+	delRowLink.innerHTML = "Delete Construct";
+	delRowLink.href = "";
+	delRowLink.onclick = function() {removeRow();};
+	tableDiv.appendChild(delRowLink);
 	
+	//element input
 	var colInput = document.createElement("input");
 	colInput.type = "text";
 	colInput.id = "colInput";
 	document.body.appendChild(colInput);
-	
 	var newColButton = document.createElement("button");
 	newColButton.innerHTML = "+";
+	newColButton.addEventListener("click", createColumn);
+	//newColButton.onclick = function() {createColumn(colInput);};
 	document.body.appendChild(newColButton);
-	newColButton.onclick = function() {createColumn(colInput);};
+	var delColLink = document.createElement("a");
+	delColLink.innerHTML = "Delete Element";
+	delColLink.href = "";
+	delColLink.onclick = function() {removeColumn();};
+	document.body.appendChild(delColLink);
 
 	//generate export buttons
-	var buttonDiv = document.getElementById("buttons"); //replace Generate Table button with these
+	var buttonDiv = document.getElementById("buttonDiv"); //replace Generate Table button with these
 	//excel
 	var exportToXLSXButton = document.createElement("button");
 	exportToXLSXButton.innerHTML = "Export to Excel";
@@ -183,8 +195,8 @@ function exportToXLSX() {
 function exportToTXT() {
 	var table = document.getElementById("repGrid");
 	
-	numRow = table.rows.length;
-	numCol = table.rows[0].cells.length;
+	var numRow = table.rows.length;
+	var numCol = table.rows[0].cells.length;
 	//format range
 	var txt = "\r\n";
 	txt += `RANGE\r\n${table.rows[0].cells[0].innerHTML} ${table.rows[0].cells[numCol - 1].innerHTML}\r\nEND RANGE\r\n\r\n`;
@@ -216,8 +228,8 @@ function exportToTXT() {
 function exportToORG() {
 	var table = document.getElementById("repGrid");
 	
-	numRow = table.rows.length;
-	numCol = table.rows[0].cells.length;
+	var numRow = table.rows.length;
+	var numCol = table.rows[0].cells.length;
 	
 	var cp = new String;
 	cp += `args <- list(<br>`;
