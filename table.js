@@ -1,39 +1,132 @@
 function generateTable() {
 	var tableDiv = document.getElementById("tableDiv");
 	var buttonDiv = document.getElementById("buttonDiv");
-	//buttonDiv.innerHTML = `<button onclick="exportToXLSX">Export to Excel</button><button onclick="exportToTXT">Export to text file</button><button onclick="exportToORG">Copy to OpenRepGrid</button>`;
+	
+	//create basic buttons and table
+	buttonDiv.innerHTML = `<button id="xlsx">Export to Excel</button><button id="txt">Export to text file</button><button id="org">Copy to OpenRepGrid</button><button id="ajax">AJAX</button>`;
 	tableDiv.innerHTML = `
 		<table id="repGrid"><tbody>
 			<tr>
 				<td contenteditable="true">${document.getElementById("ratingL").value}</td>
 				<td contenteditable="true">${document.getElementById("ratingR").value}</td>
 			</tr>
-		</tbody></table>`;
-		//<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput"><button id="addConstruct");">+</button>
-		//<a onclick="removeRow();" href="">Delete Construct</a>`;
-	//tableDiv.insertAdjacentHTML("afterend", `<input type="text" id="colInput"><button id="addElement");">+</button>
-	//<a onclick="removeColumn();" href="">Delete Element</a>`);
-	//create rest of table
-	var colLabels = document.getElementById("elements").value.split(",");
-	if (colLabels[0] == "") { colLabels[0] = "Element1"; } //default element
-	for (var i = 0; i < colLabels.length; i++) {
-		createColumn(colLabels[i].trim());
+		</tbody></table>
+		<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput"><button id="addConstruct");">+</button>
+		<a id="delConstruct" href="#">Delete Construct</a>`;
+	tableDiv.insertAdjacentHTML("afterend", `<input type="text" id="colInput"><button id="addElement");">+</button>
+	<a id="delElement" href="#">Delete Element</a>`);
+	
+	//add elements
+	var elements = document.getElementById("elements").value.split(",");
+	if (elements[0] == "") { elements[0] = "Element 1"; } //default element
+	for (var i = 0; i < elements.length; i++) {
+		addElement(elements[i].trim());
+	}
+	//add constructs
+	var leftConstructs = document.getElementById("constructs").value.split(",");
+	if (leftConstructs[0] == "") { leftLabels[0] = "Construct 1"; } //default construct
+	var rightConstructs = document.getElementById("not-constructs").value.split(",");
+	for (var i = 0; i < leftConstructs.length; i++) {
+		if (rightConstructs[i] == "") { rightConstructs[i] = `Not ${leftConstructs[i]}`; }
+		addConstruct(leftConstructs[i].trim(), rightConstructs[i].trim());
 	}
 	
-	var leftLabels = document.getElementById("constructs").value.split(",");
-	if (leftLabels[0] == "") { leftLabels[0] = "Construct1"; } //default construct
-	var rightLabels = document.getElementById("not-constructs").value.split(",");
-	for (var i = 0; i < leftLabels.length; i++) {
-		if (rightLabels[i] == "") { rightLabels[i] = `Not ${leftLabels[i]}`; }
-		createRow(leftLabels[i].trim(), rightLabels[i].trim());
-	}
-	
-	createButtonsAndInputs();
-	//document.getElementById("buttonDiv").removeChild(document.getElementById("generate"));
+	onTableLoad();
 	document.body.removeChild(document.getElementById("input"));
 }
 
-function createRow(inputLeft, inputRight) {
+function onTableLoad() {
+	document.getElementById("addConstruct").addEventListener("click", function() { addConstruct(document.getElementById("rowLeftInput"), document.getElementById("rowRightInput"));});
+	document.getElementById("addElement").addEventListener("click", function() { addElement(document.getElementById("colInput"));});
+	
+	document.getElementById("delElement").addEventListener("click", removeElement);
+	document.getElementById("delConstruct").addEventListener("click", removeConstruct);
+	
+	document.getElementById("xlsx").addEventListener("click", exportToXLSX);
+	document.getElementById("txt").addEventListener("click", exportToTXT);
+	document.getElementById("org").addEventListener("click", exportToORG);
+	document.getElementById("ajax").onclick = function() {
+		var table = document.getElementById("repGrid");	
+		var numRow = table.rows.length;
+		var numCol = table.rows[0].cells.length;
+		var elements = new Array();
+		for (var i = 1; i < numCol - 1; i++) {
+			elements.push(table.rows[0].cells[i].innerHTML);
+		}
+		var constructs = new Array();
+		for (var i = 1; i < numRow; i++) {
+			constructs.push(table.rows[i].cells[0].innerHTML);
+		}
+		var notconstructs = new Array();
+		for (var i = 1; i < numRow; i++) {
+			notconstructs.push(table.rows[i].cells[numCol - 1].innerHTML);
+		}
+		var scores = new Array();
+		for (var i = 1; i < numRow; i++) {
+			for (var j = 1; j < numCol - 1; j++) {
+				scores.push(table.rows[i].cells[j].innerHTML);
+			}
+		}
+		var ratingL = table.rows[0].cells[0].innerHTML;
+		var ratingR = table.rows[0].cells[numCol - 1].innerHTML;
+		makeRequest("plotscript.php", elements, constructs, notconstructs, scores, ratingL, ratingR);
+	};
+	
+	function makeRequest(url, elements, constructs, notconstructs, scores, ratingL, ratingR)	{
+		var xhr = new XMLHttpRequest();
+		
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		var data = 'elements=' + encodeURIComponent(elements)
+		         + '&constructs=' + encodeURIComponent(constructs)
+				 + '&notconstructs=' + encodeURIComponent(notconstructs)
+				 + '&scores=' + encodeURIComponent(scores)
+				 + '&ratingL=' + encodeURIComponent(ratingL)
+				 + '&ratingR=' + encodeURIComponent(ratingR);
+		
+		xhr.send(data);
+	
+		xhr.onreadystatechange = function() {		
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					console.log("AJAX success");
+				}
+				else {
+					console.log("AJAX err");
+				}
+			}
+		};
+	}
+	
+}
+
+function addElement(input) {
+	var label = input; //get input
+	if (typeof label != 'string') {
+		label = label.value;
+	}
+	
+	if (label != "") {
+		var table = document.getElementById("repGrid");
+		var colNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
+		
+		var headerCell = document.createElement("th"); //create construct label
+		headerCell.innerHTML = label;
+		headerCell.contentEditable = "true";
+		table.rows[0].insertBefore(headerCell, table.rows[0].cells[colNum]); //inserts before the last column (last column is ratings/not-constructs)
+				
+		for (var i = 1; i < table.rows.length; i++) { //make input for eveyr other cell in column
+			var inputCell = document.createElement("td");
+			inputCell.contentEditable = "true";
+			inputCell.onkeypress = "return testCharacter(event);"
+			table.rows[i].insertBefore(inputCell, table.rows[i].cells[colNum]); //again, instert before last column
+		}
+	}
+	
+	input.value = ""; //clear input
+}
+
+function addConstruct(inputLeft, inputRight) {
 	var leftLabel = inputLeft; //get input
 	if (typeof leftLabel != 'string') {
 		leftLabel = leftLabel.value;
@@ -69,39 +162,6 @@ function createRow(inputLeft, inputRight) {
 	}
 }
 
-function createColumn(input) {
-	//console.log(input);
-	if (document.getElementById("colInput")) {
-		input = document.getElementById("colInput");
-		console.log(document.getElementById("colInput").value);//input = document.getElementById("colInput").value;
-		}
-	//var columnLabel = document.getElementById("columnLabel");
-	var label = input; //get input
-	if (typeof label != 'string') {
-		console.log("test");
-		label = label.value;
-	}
-		
-	if (label != "") {
-		var table = document.getElementById("repGrid");
-		var colNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
-		
-		var headerCell = document.createElement("th"); //create construct label
-		headerCell.innerHTML = label;
-		headerCell.contentEditable = "true";
-		table.rows[0].insertBefore(headerCell, table.rows[0].cells[colNum]); //inserts before the last column (last column is ratings/not-constructs)
-				
-		for (var i = 1; i < table.rows.length; i++) { //make input for eveyr other cell in column
-			var inputCell = document.createElement("td");
-			inputCell.contentEditable = "true";
-			inputCell.onkeypress = "return testCharacter(event);"
-			table.rows[i].insertBefore(inputCell, table.rows[i].cells[colNum]); //again, instert before last column
-		}
-	}
-	
-	input.value = ""; //clear input
-}
-
 function testCharacter(event) {
 	if ((event.keyCode >= 48 && event.keyCode <= 57) || event.keyCode === 13) {
 		return true;
@@ -110,76 +170,19 @@ function testCharacter(event) {
 	}
 }
 
-function createButtonsAndInputs() {
-	var tableDiv = document.getElementById("tableDiv");
-	
-	//construct input
-	var rowLeftInput = document.createElement("input");
-	rowLeftInput.type = "text";
-	rowLeftInput.id = "rowLeftInput";
-	tableDiv.appendChild(rowLeftInput);
-	var rowRightInput = document.createElement("input");
-	rowRightInput.type = "text";
-	rowRightInput.id = "rowRightInput";
-	tableDiv.appendChild(rowRightInput);
-	var newRowButton = document.createElement("button");
-	newRowButton.innerHTML = "+";
-	newRowButton.onclick = function() {createRow(rowLeftInput, rowRightInput);};
-	tableDiv.appendChild(newRowButton);
-	var delRowLink = document.createElement("a");
-	delRowLink.innerHTML = "Delete Construct";
-	delRowLink.href = "";
-	delRowLink.onclick = function() {removeRow();};
-	tableDiv.appendChild(delRowLink);
-	
-	//element input
-	var colInput = document.createElement("input");
-	colInput.type = "text";
-	colInput.id = "colInput";
-	document.body.appendChild(colInput);
-	var newColButton = document.createElement("button");
-	newColButton.innerHTML = "+";
-	newColButton.addEventListener("click", createColumn);
-	//newColButton.onclick = function() {createColumn(colInput);};
-	document.body.appendChild(newColButton);
-	var delColLink = document.createElement("a");
-	delColLink.innerHTML = "Delete Element";
-	delColLink.href = "";
-	delColLink.onclick = function() {removeColumn();};
-	document.body.appendChild(delColLink);
-
-	//generate export buttons
-	var buttonDiv = document.getElementById("buttonDiv"); //replace Generate Table button with these
-	//excel
-	var exportToXLSXButton = document.createElement("button");
-	exportToXLSXButton.innerHTML = "Export to Excel";
-	exportToXLSXButton.addEventListener("click", exportToXLSX);
-	buttonDiv.appendChild(exportToXLSXButton);
-	//txt
-	var exportToTXTButton = document.createElement("button");
-	exportToTXTButton.innerHTML = "Export to text file";
-	exportToTXTButton.addEventListener("click", exportToTXT);
-	buttonDiv.appendChild(exportToTXTButton);
-	//OpenRepGrid
-	var exportToORGButton = document.createElement("button");
-	exportToORGButton.innerHTML = "Copy to OpenRepGrid";
-	exportToORGButton.addEventListener("click", exportToORG);
-	buttonDiv.appendChild(exportToORGButton);
-}
-
-function removeRow() {
-	var table = document.getElementById("repGrid");
-	if (table.rows.length > 1) { //make sure at least 2 rows are left
-		table.deleteRow(table.rows.length - 1);
-	}
-}
-
-function removeColumn() {
+function removeElement() {
 	var table = document.getElementById("repGrid");
 	if (table.rows[0].cells.length > 2) { //make sure at least 2 columns are left
 		for (var i = 0; i < table.rows.length; i++) {
 			table.rows[i].deleteCell(table.rows[i].cells.length - 2);
 		}
+	}
+}
+
+function removeConstruct() {
+	var table = document.getElementById("repGrid");
+	if (table.rows.length > 1) { //make sure at least 2 rows are left
+		table.deleteRow(table.rows.length - 1);
 	}
 }
 
