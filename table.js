@@ -5,16 +5,12 @@ function generateTable() {
 	//create basic buttons and table
 	buttonDiv.innerHTML = `<button id="xlsx">Export to Excel</button><button id="txt">Export to text file</button><button id="org">Copy to OpenRepGrid</button><button id="ajax">AJAX</button>`;
 	tableDiv.innerHTML = `
-		<table id="repGrid"><tbody>
-			<tr>
+		<table id="repGrid"><tbody><tr>
 				<td contenteditable="true">${document.getElementById("ratingL").value}</td>
 				<td contenteditable="true">${document.getElementById("ratingR").value}</td>
-			</tr>
-		</tbody></table>
-		<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput"><button id="addConstruct");">+</button>
-		<a id="delConstruct" href="#">Delete Construct</a>`;
-	tableDiv.insertAdjacentHTML("afterend", `<input type="text" id="colInput"><button id="addElement");">+</button>
-	<a id="delElement" href="#">Delete Element</a>`);
+			</tr></tbody></table>
+		<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput"><button id="addConstruct");">+</button> <a id="delConstruct" href="#">Delete Construct</a>`;
+	tableDiv.insertAdjacentHTML("afterend", `<input type="text" id="colInput"><button id="addElement");">+</button>	<a id="delElement" href="#">Delete Element</a>`);
 	
 	//add elements
 	var elements = document.getElementById("elements").value.split(",");
@@ -45,59 +41,8 @@ function onTableLoad() {
 	document.getElementById("xlsx").addEventListener("click", exportToXLSX);
 	document.getElementById("txt").addEventListener("click", exportToTXT);
 	document.getElementById("org").addEventListener("click", exportToORG);
-	document.getElementById("ajax").onclick = function() {
-		var table = document.getElementById("repGrid");	
-		var numRow = table.rows.length;
-		var numCol = table.rows[0].cells.length;
-		var elements = new Array();
-		for (var i = 1; i < numCol - 1; i++) {
-			elements.push(table.rows[0].cells[i].innerHTML);
-		}
-		var constructs = new Array();
-		for (var i = 1; i < numRow; i++) {
-			constructs.push(table.rows[i].cells[0].innerHTML);
-		}
-		var notconstructs = new Array();
-		for (var i = 1; i < numRow; i++) {
-			notconstructs.push(table.rows[i].cells[numCol - 1].innerHTML);
-		}
-		var scores = new Array();
-		for (var i = 1; i < numRow; i++) {
-			for (var j = 1; j < numCol - 1; j++) {
-				scores.push(table.rows[i].cells[j].innerHTML);
-			}
-		}
-		var ratingL = table.rows[0].cells[0].innerHTML;
-		var ratingR = table.rows[0].cells[numCol - 1].innerHTML;
-		makeRequest("plotscript.php", elements, constructs, notconstructs, scores, ratingL, ratingR);
-	};
 	
-	function makeRequest(url, elements, constructs, notconstructs, scores, ratingL, ratingR)	{
-		var xhr = new XMLHttpRequest();
-		
-		xhr.open("POST", url, true);
-		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		var data = 'elements=' + encodeURIComponent(elements)
-		         + '&constructs=' + encodeURIComponent(constructs)
-				 + '&notconstructs=' + encodeURIComponent(notconstructs)
-				 + '&scores=' + encodeURIComponent(scores)
-				 + '&ratingL=' + encodeURIComponent(ratingL)
-				 + '&ratingR=' + encodeURIComponent(ratingR);
-		
-		xhr.send(data);
-	
-		xhr.onreadystatechange = function() {		
-			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					console.log("AJAX success");
-				}
-				else {
-					console.log("AJAX err");
-				}
-			}
-		};
-	}
-	
+	document.getElementById("ajax").addEventListener("click", ajaxOutput);	
 }
 
 function addElement(input) {
@@ -159,14 +104,6 @@ function addConstruct(inputLeft, inputRight) {
 		
 		inputLeft.value = ""; //clear input
 		inputRight.value = "";
-	}
-}
-
-function testCharacter(event) {
-	if ((event.keyCode >= 48 && event.keyCode <= 57) || event.keyCode === 13) {
-		return true;
-	} else {
-		return false;
 	}
 }
 
@@ -264,6 +201,56 @@ function exportToORG() {
 	document.write(cp);
 }
 
-function importFromXLSX() {
-	var table = document.getElementById("repGrid");
+function ajaxOutput() {
+	var table = document.getElementById("repGrid");	
+	var numRow = table.rows.length;
+	var numCol = table.rows[0].cells.length;
+	var elements = new Array();
+	for (var i = 1; i < numCol - 1; i++) {
+		elements.push(table.rows[0].cells[i].innerHTML);
+	}
+	var constructs = new Array();
+	for (var i = 1; i < numRow; i++) {
+		constructs.push(table.rows[i].cells[0].innerHTML);
+	}
+	var notconstructs = new Array();
+	for (var i = 1; i < numRow; i++) {
+		notconstructs.push(table.rows[i].cells[numCol - 1].innerHTML);
+	}
+	var scores = new Array();
+	for (var i = 1; i < numRow; i++) {
+		for (var j = 1; j < numCol - 1; j++) {
+			scores.push(table.rows[i].cells[j].innerHTML);
+		}
+	}
+	var ratingL = table.rows[0].cells[0].innerHTML;
+	var ratingR = table.rows[0].cells[numCol - 1].innerHTML;
+	makeRequest("plotscript.php", elements, constructs, notconstructs, scores, ratingL, ratingR);
+	
+	function makeRequest(url, elements, constructs, notconstructs, scores, ratingL, ratingR)	{
+		var oReq = new XMLHttpRequest();
+		
+		oReq.open("POST", url, true);
+		oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		var data = 'elements=' + encodeURIComponent(elements)
+		         + '&constructs=' + encodeURIComponent(constructs)
+				 + '&notconstructs=' + encodeURIComponent(notconstructs)
+				 + '&scores=' + encodeURIComponent(scores)
+				 + '&ratingL=' + encodeURIComponent(ratingL)
+				 + '&ratingR=' + encodeURIComponent(ratingR);	
+		oReq.send(data);
+		
+		oReq.onreadystatechange = function() {		
+			if (oReq.readyState === 4) {
+				if (oReq.status === 200) {
+					console.log("AJAX success");
+					console.log(oReq.responseText);
+					//window.open();
+				}
+				else {
+					console.log("AJAX err");
+				}
+			}
+		};
+	}	
 }

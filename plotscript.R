@@ -16,6 +16,8 @@ spec = matrix(c(
 ), byrow=TRUE, ncol=5)
 opt = getopt(spec) #get arguments
 
+getwd()
+
 if (is.na(opt$name) || is.na(opt$l.name) || is.na(opt$r.name) || is.na(opt$scores))
 {
 	stop("Requires arguments: --name, --l.name, --r.name, --scores") 
