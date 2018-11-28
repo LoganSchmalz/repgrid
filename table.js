@@ -231,13 +231,9 @@ function ajaxOutput() {
 		var oReq = new XMLHttpRequest();
 		
 		oReq.open("POST", url, true);
-		oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		var data = 'elements=' + encodeURIComponent(elements)
-		         + '&constructs=' + encodeURIComponent(constructs)
-				 + '&notconstructs=' + encodeURIComponent(notconstructs)
-				 + '&scores=' + encodeURIComponent(scores)
-				 + '&ratingL=' + encodeURIComponent(ratingL)
-				 + '&ratingR=' + encodeURIComponent(ratingR);	
+		oReq.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+		var data = JSON.stringify({elements: elements, constructs: constructs, notconstructs: notconstructs, scores: scores, ratingL: ratingL, ratingR: ratingR});
+		console.log(data);
 		oReq.send(data);
 		
 		oReq.onreadystatechange = function() {		

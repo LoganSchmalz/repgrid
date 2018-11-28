@@ -4,19 +4,18 @@ library(ggplot2)
 library(OpenRepGrid)
 
 #these are some example arguments
-# --name="Element 1|Element 2|Element 3" --l.name="Construct 1|Construct 2|Construct 3" --r.name "Not Construct 1|Not Construct 2|Not Construct 3" --scores "1^|2^|3^|4^|5^|6^|7^|1^|2" --l.pole="1", --r.pole="7"
+# --name="Element 1|Element 2|Element 3" --l.name="Construct 1|Construct 2|Construct 3" --r.name "Not Construct 1|Not Construct 2|Not Construct 3" --scores "1^|2^|3^|4^|5^|6^|7^|1^|2" --l.pole="1" --r.pole="7"
 
 spec = matrix(c(
-	'name', 'n', 1, "character", "Element names",
-	'l.name', 'l', 1, "character", "Left side constructs",
-	'r.name', 'r', 1, "character", "Right side constructs",
-	'scores', 's', 1, "character", "Scores",
-	'l.pole', 'o', 1, "integer", "Left pole rating",
-	'r.pole', 'p', 1, "integer", "Right pole rating"
+	'name', NA, 1, "character", "Element names",
+	'l.name', NA, 1, "character", "Left side constructs",
+	'r.name', NA, 1, "character", "Right side constructs",
+	'scores', NA, 1, "character", "Scores",
+	'l.pole', NA, 1, "integer", "Left pole rating",
+	'r.pole', NA, 1, "integer", "Right pole rating",
+	'workdir', NA, 2, "character", "Working directory"
 ), byrow=TRUE, ncol=5)
 opt = getopt(spec) #get arguments
-
-getwd()
 
 if (is.na(opt$name) || is.na(opt$l.name) || is.na(opt$r.name) || is.na(opt$scores))
 {
@@ -25,6 +24,11 @@ if (is.na(opt$name) || is.na(opt$l.name) || is.na(opt$r.name) || is.na(opt$score
 if (is.na(opt$r.pole) || is.na(opt$l.pole))
 {
 	print("The arguments --l.pole and --r.pole are recommended to visualize more data")
+}
+if (!is.null(opt$workdir)) 
+{
+	setwd(opt$workdir);
+	getwd();
 }
 
 # these separate arguments by the | (pipe) character
@@ -43,4 +47,3 @@ grid <- setScale(grid, opt$l.pole, opt$r.pole)
 
 # image generation
 ggsave(filename="bertin.png", plot=bertin(grid))
-
