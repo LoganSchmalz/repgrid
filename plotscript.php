@@ -1,17 +1,18 @@
 <?php
 session_start();
 $data = file_get_contents('php://input');
-echo($data);
-$elements = $_POST['elements'];
-$constructs = $_POST['constructs'];
-$notconstructs = $_POST['notconstructs'];
-$scores = $_POST['scores'];
-$ratingL = $_POST['ratingL'];
-$ratingR = $_POST['ratingR'];
+$data = json_decode($data, true);
+$elements = escapeshellarg(implode("|", $data['elements']));
+$constructs = escapeshellarg(implode("|", $data['constructs']));
+$notconstructs = escapeshellarg(implode("|", $data['notconstructs']));
+$scores = escapeshellarg(implode("^|", $data['scores']));
+$ratingL = escapeshellarg($data['ratingL']);
+$ratingR = escapeshellarg($data['ratingR']);
 
-//$workingdir = tempdir(null, session_id() . '_');
-//exec("Rscript H:/GitHub/repgrid/plotscript.R")
-//var_dump($data, true);
+$workingdir = tempdir(null, session_id() . '_');
+$args = "--name=$elements --l.name=$constructs --r.name=$notconstructs --scores=$scores --l.pole=$ratingL --r.pole=$ratingR --workdir=\"$workingdir\"";
+exec("Rscript plotscript.R $args 2>&1", $output, $return_var);
+var_dump($output);
 
 //echo $workingdir;
 //var_dump(is_dir($workingdir), is_writable($workingdir));

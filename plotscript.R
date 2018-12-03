@@ -7,12 +7,12 @@ library(OpenRepGrid)
 # --name="Element 1|Element 2|Element 3" --l.name="Construct 1|Construct 2|Construct 3" --r.name "Not Construct 1|Not Construct 2|Not Construct 3" --scores "1^|2^|3^|4^|5^|6^|7^|1^|2" --l.pole="1" --r.pole="7"
 
 spec = matrix(c(
-	'name', NA, 1, "character", "Element names",
-	'l.name', NA, 1, "character", "Left side constructs",
-	'r.name', NA, 1, "character", "Right side constructs",
-	'scores', NA, 1, "character", "Scores",
-	'l.pole', NA, 1, "integer", "Left pole rating",
-	'r.pole', NA, 1, "integer", "Right pole rating",
+	'name', NA, 2, "character", "Element names",
+	'l.name', NA, 2, "character", "Left side constructs",
+	'r.name', NA, 2, "character", "Right side constructs",
+	'scores', NA, 2, "character", "Scores",
+	'l.pole', NA, 2, "integer", "Left pole rating",
+	'r.pole', NA, 2, "integer", "Right pole rating",
 	'workdir', NA, 2, "character", "Working directory"
 ), byrow=TRUE, ncol=5)
 opt = getopt(spec) #get arguments
@@ -28,8 +28,8 @@ if (is.na(opt$r.pole) || is.na(opt$l.pole))
 if (!is.null(opt$workdir)) 
 {
 	setwd(opt$workdir);
-	getwd();
 }
+#getwd();
 
 # these separate arguments by the | (pipe) character
 # strsplit produces an array of vectors, we only want the first element because there are no other elements

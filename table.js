@@ -3,7 +3,7 @@ function generateTable() {
 	var buttonDiv = document.getElementById("buttonDiv");
 	
 	//create basic buttons and table
-	buttonDiv.innerHTML = `<button id="xlsx">Export to Excel</button><button id="txt">Export to text file</button><button id="org">Copy to OpenRepGrid</button><button id="ajax">AJAX</button>`;
+	buttonDiv.innerHTML = `<button id="xlsx">Export to Excel</button><button id="txt">Export to text file</button><button id="org">Copy to OpenRepGrid</button><button id="analyze">Download Analysis</button>`;
 	tableDiv.innerHTML = `
 		<table id="repGrid"><tbody><tr>
 				<td contenteditable="true">${document.getElementById("ratingL").value}</td>
@@ -42,7 +42,7 @@ function onTableLoad() {
 	document.getElementById("txt").addEventListener("click", exportToTXT);
 	document.getElementById("org").addEventListener("click", exportToORG);
 	
-	document.getElementById("ajax").addEventListener("click", ajaxOutput);	
+	document.getElementById("analyze").addEventListener("click", downloadAnalysis);	
 }
 
 function addElement(input) {
@@ -201,7 +201,7 @@ function exportToORG() {
 	document.write(cp);
 }
 
-function ajaxOutput() {
+function downloadAnalysis() {
 	var table = document.getElementById("repGrid");	
 	var numRow = table.rows.length;
 	var numCol = table.rows[0].cells.length;
