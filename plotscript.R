@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 library(getopt)
-library(ggplot2)
 library(OpenRepGrid)
 
 #these are some example arguments
@@ -27,9 +26,9 @@ if (is.na(opt$r.pole) || is.na(opt$l.pole))
 }
 if (!is.null(opt$workdir)) 
 {
-	setwd(opt$workdir);
+	setwd(opt$workdir)
 }
-#getwd();
+#getwd()
 
 # these separate arguments by the | (pipe) character
 # strsplit produces an array of vectors, we only want the first element because there are no other elements
@@ -45,5 +44,94 @@ opt$scores <- sapply(opt$scores, strtoi) # convert each score string to integers
 grid = makeRepgrid(list(name=opt$name, l.name=opt$l.name,r.name=opt$r.name, scores=opt$scores))
 grid <- setScale(grid, opt$l.pole, opt$r.pole)
 
-# image generation
-ggsave(filename="bertin.png", plot=bertin(grid))
+# plots
+dir.create("plot")
+setwd("plot")
+pdf("bertin.pdf")
+try(bertin(grid), TRUE)
+graphics.off()
+pdf("bertinCluster.pdf")
+try(bertinCluster(grid), TRUE)
+graphics.off()
+pdf("biplot2d.pdf")
+try(biplot2d(grid), TRUE)
+graphics.off()
+pdf("biplotPseudo3d.pdf")
+try(biplotPseudo3d(grid), TRUE)
+graphics.off()
+pdf("biplotSlater2d.pdf")
+try(biplotSlater2d(grid), TRUE)
+graphics.off()
+pdf("biplotSlaterPseudo3d.pdf")
+try(biplotSlaterPseudo3d(grid), TRUE)
+graphics.off()
+pdf("biplotEsa2d.pdf")
+try(biplotEsa2d(grid), TRUE)
+graphics.off()
+pdf("biplotEsaPseudo3d.pdf")
+try(biplotEsaPseudo3d(grid), TRUE)
+graphics.off()
+pdf("cluster.pdf") # misc
+try(cluster(grid), TRUE)
+graphics.off()
+
+# element analyses
+setwd("..")
+dir.create("element")
+setwd("element")
+sink("statsElements.txt")
+try(statsElements(grid), TRUE)
+sink("elementCor.txt")
+try(elementCor(grid), TRUE)
+sink("distanceElements.txt")
+try(distance(grid, along=2), TRUE)
+sink("distanceSlater.txt")
+try(distanceSlater(grid), TRUE)
+sink("distanceHartmann.txt")
+try(distanceHartmann(grid), TRUE)
+sink("distanceNormalized.txt")
+try(distanceNormalized(grid), TRUE)
+pdf("clusterElements.pdf")
+try(cluster(grid, along=2), TRUE)
+graphics.off()
+
+# construct analyses
+setwd("..")
+dir.create("construct")
+setwd("construct")
+sink("statsConstructs.txt")
+try(statsConstructs(grid), TRUE)
+sink("constructCor.txt")
+try(constructCor(grid), TRUE)
+sink("constructRmsCor.txt")
+try(constructRmsCor(grid), TRUE)
+sink("constructSomersDCol.txt")
+try(constructD(grid), TRUE)
+sink("constructSomersDRow.txt")
+try(constructD(grid, dep="r"), TRUE)
+sink("distanceConstructs.txt")
+try(distance(grid), TRUE)
+#add swapped poles??
+sink("constructPca.txt")
+try(constructPca(grid), TRUE)
+pdf("clusterConstructs.pdf")
+try(cluster(grid, along=1), TRUE)
+graphics.off()
+
+# index analyses
+setwd("..")
+dir.create("index")
+setwd("index")
+sink("indexIntensity.txt")
+try(indexIntensity(grid), TRUE)
+sink("indexPvaff.txt")
+try(indexPvaff(grid), TRUE)
+sink("indexConflictSladeSheehan.txt")
+try(indexConflict1(grid), TRUE)
+sink("indexConflictBasslerEtAl.txt")
+try(indexConflict2(grid), TRUE)
+sink("indexConflictBell.txt")
+try(indexConflict3(grid), TRUE)
+# requires index input
+#sink("indexDilemma.txt")
+#indexDilemma(grid)
