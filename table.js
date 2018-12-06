@@ -1,48 +1,47 @@
 function generateTable() {
-	var tableDiv = document.getElementById("tableDiv");
-	var buttonDiv = document.getElementById("buttonDiv");
+	var elements = document.getElementById("elements").value.split(",");
+	var leftConstructs = document.getElementById("constructs").value.split(",");
+	var rightConstructs = document.getElementById("not-constructs").value.split(",");	
+	var main = document.getElementsByTagName("main")[0];
 	
-	//create basic buttons and table
-	buttonDiv.innerHTML = `<button id="xlsx">Export to Excel</button><button id="txt">Export to text file</button><button id="org">Copy to OpenRepGrid</button><button id="analyze">Download Analysis</button>`;
-	tableDiv.innerHTML = `
-		<table id="repGrid"><tbody><tr>
-				<td contenteditable="true">${document.getElementById("ratingL").value}</td>
-				<td contenteditable="true">${document.getElementById("ratingR").value}</td>
-			</tr></tbody></table>
-		<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput"><button id="addConstruct");">+</button> <a id="delConstruct" href="#">Delete Construct</a>`;
-	tableDiv.insertAdjacentHTML("afterend", `<input type="text" id="colInput"><button id="addElement");">+</button>	<a id="delElement" href="#">Delete Element</a>`);
+	main.innerHTML = `
+		<div id="grid"><button id="xlsx">Export to Excel</button><button id="txt">Export to text file</button><button id="org">Copy to OpenRepGrid</button><button id="analyze">Download Analysis</button><br><br>
+		<div id="tableDiv">
+			<table id="repGrid"><tbody><tr>
+					<td contenteditable="true">${document.getElementById("ratingL").value}</td>
+					<td contenteditable="true">${document.getElementById("ratingR").value}</td>
+				</tr></tbody></table>
+			<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput"><button id="addConstruct">+</button> <a id="delConstruct" href="#">Delete Construct</a></div>
+			<input type="text" id="colInput"><button id="addElement">+</button>	<a id="delElement" href="#">Delete Element</a></div>
+		<div><h3>Interview:</h3><div id="interview"></div><button id="next">Next</button>`;
 	
 	//add elements
-	var elements = document.getElementById("elements").value.split(",");
 	if (elements[0] == "") { elements[0] = "Element 1"; } //default element
 	for (var i = 0; i < elements.length; i++) {
 		addElement(elements[i].trim());
 	}
 	//add constructs
-	var leftConstructs = document.getElementById("constructs").value.split(",");
 	if (leftConstructs[0] == "") { leftLabels[0] = "Construct 1"; } //default construct
-	var rightConstructs = document.getElementById("not-constructs").value.split(",");
 	for (var i = 0; i < leftConstructs.length; i++) {
 		if (rightConstructs[i] == "") { rightConstructs[i] = `Not ${leftConstructs[i]}`; }
 		addConstruct(leftConstructs[i].trim(), rightConstructs[i].trim());
 	}
 	
 	onTableLoad();
-	document.body.removeChild(document.getElementById("input"));
 }
 
 function onTableLoad() {
-	document.getElementById("addConstruct").addEventListener("click", function() { addConstruct(document.getElementById("rowLeftInput"), document.getElementById("rowRightInput"));});
 	document.getElementById("addElement").addEventListener("click", function() { addElement(document.getElementById("colInput"));});
-	
+	document.getElementById("addConstruct").addEventListener("click", function() { addConstruct(document.getElementById("rowLeftInput"), document.getElementById("rowRightInput"));});
 	document.getElementById("delElement").addEventListener("click", removeElement);
 	document.getElementById("delConstruct").addEventListener("click", removeConstruct);
 	
 	document.getElementById("xlsx").addEventListener("click", exportToXLSX);
 	document.getElementById("txt").addEventListener("click", exportToTXT);
 	document.getElementById("org").addEventListener("click", exportToORG);
+	document.getElementById("analyze").addEventListener("click", downloadAnalysis);
 	
-	document.getElementById("analyze").addEventListener("click", downloadAnalysis);	
+	document.getElementById("next").addEventListener("click", generateInterview);
 }
 
 function addElement(input) {
@@ -64,7 +63,7 @@ function addElement(input) {
 			var inputCell = document.createElement("td");
 			inputCell.contentEditable = "true";
 			inputCell.onkeypress = "return testCharacter(event);"
-			table.rows[i].insertBefore(inputCell, table.rows[i].cells[colNum]); //again, instert before last column
+			table.rows[i].insertBefore(inputCell, table.rows[i].cells[colNum]); //again, insert before last column
 		}
 	}
 	
@@ -105,6 +104,13 @@ function addConstruct(inputLeft, inputRight) {
 		inputLeft.value = ""; //clear input
 		inputRight.value = "";
 	}
+}
+
+function generateInterview() {
+	var table = document.getElementById("repGrid");
+	var numCol = table.rows[0].cells.length - 2;
+	var interview = document.getElementById("interview");
+	interview.innerHTML += `${table.rows[0].cells[parseInt(numCol * Math.random(), 10) + 1].innerHTML}, ${table.rows[0].cells[parseInt(numCol * Math.random(), 10) + 1].innerHTML}, ${table.rows[0].cells[parseInt(numCol * Math.random(), 10) + 1].innerHTML}<br>`;
 }
 
 function removeElement() {

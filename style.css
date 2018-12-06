@@ -1,3 +1,8 @@
+html, body {
+	height: 100%;
+	width: 100%;
+}
+
 table {
     border-collapse: collapse;
 	border-style: hidden;
@@ -15,4 +20,19 @@ td, th {
 footer {
 	position: fixed;
 	bottom: 0px;
+}
+
+#tableDiv {
+	float: left;
+}
+
+#grid {
+	overflow: auto;
+}
+
+#interview {
+	background-color: whitesmoke;
+	overflow: auto;
+	width: 40vh;
+	height: 15vh;
 }
