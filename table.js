@@ -31,8 +31,8 @@ function generateTable() {
 }
 
 function onTableLoad() {
-	document.getElementById("addElement").addEventListener("click", function() { addElement(document.getElementById("colInput"));});
-	document.getElementById("addConstruct").addEventListener("click", function() { addConstruct(document.getElementById("rowLeftInput"), document.getElementById("rowRightInput"));});
+	document.getElementById("addElement").addEventListener("click", addElement); //document.getElementById("colInput")
+	document.getElementById("addConstruct").addEventListener("click", function() {addConstruct();});
 	document.getElementById("delElement").addEventListener("click", removeElement);
 	document.getElementById("delConstruct").addEventListener("click", removeConstruct);
 	
@@ -44,66 +44,38 @@ function onTableLoad() {
 	document.getElementById("next").addEventListener("click", generateInterview);
 }
 
-function addElement(input) {
-	var label = input; //get input
-	if (typeof label != 'string') {
-		label = label.value;
-	}
+function addElement(input = document.getElementById("colInput")) {
+	var label = (typeof input != 'string' ? input.value : input); //get input
 	
-	if (label != "") {
-		var table = document.getElementById("repGrid");
-		var colNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
-		
-		var headerCell = document.createElement("th"); //create construct label
-		headerCell.innerHTML = label;
-		headerCell.contentEditable = "true";
-		table.rows[0].insertBefore(headerCell, table.rows[0].cells[colNum]); //inserts before the last column (last column is ratings/not-constructs)
-				
-		for (var i = 1; i < table.rows.length; i++) { //make input for eveyr other cell in column
-			var inputCell = document.createElement("td");
-			inputCell.contentEditable = "true";
-			inputCell.onkeypress = "return testCharacter(event);"
-			table.rows[i].insertBefore(inputCell, table.rows[i].cells[colNum]); //again, insert before last column
-		}
+	var table = document.getElementById("repGrid");
+	var colNum = table.rows[0].cells.length - 1; //subtract 1 so we know index of last column (arrays start at 0)
+	
+	var headerCell = `<th contenteditable="true">${label}</th>`;
+	table.rows[0].cells[colNum].insertAdjacentHTML('beforebegin', headerCell);		
+	
+	for (var i = 1; i < table.rows.length; i++) { //make input for every other cell in column
+		var cell = `<th contenteditable="true"></th>`;
+		table.rows[i].cells[colNum].insertAdjacentHTML('beforebegin', cell); //again, insert before last column
 	}
 	
 	input.value = ""; //clear input
 }
 
-function addConstruct(inputLeft, inputRight) {
-	var leftLabel = inputLeft; //get input
-	if (typeof leftLabel != 'string') {
-		leftLabel = leftLabel.value;
-	}
-	var rightLabel = inputRight;
-	if (typeof rightLabel != 'string') {
-		rightLabel = rightLabel.value;
-	}
+function addConstruct(inputLeft = document.getElementById("rowLeftInput"), inputRight = document.getElementById("rowRightInput")) {
+	//var leftLabel = document.getElementById("rowLeftInput");
+	//console.log(leftLabel);
+	console.log(inputLeft);
+	var leftLabel = (typeof inputLeft != 'string' ? inputLeft.value : inputLeft); //get input
+	var rightLabel = (typeof inputRight != 'string' ? inputRight.value : inputRight);
+
 	
 	if (leftLabel != "") {
-		var table = document.getElementById("repGrid");
-		var row = table.insertRow(-1);
-		
-		var headerCell = document.createElement("th"); //create left side
-		headerCell.innerHTML = leftLabel;
-		headerCell.contentEditable = "true";
-		row.appendChild(headerCell);
-		
-		for (var i = 1; i < table.rows[0].cells.length - 1; i++) { //make input for every cell other than ends
-			var inputCell = document.createElement("td");
-			inputCell.contentEditable = "true";
-			inputCell.onkeypress = "return testCharacter(event);"
-			row.appendChild(inputCell);
-		}
-		
-		headerCell = document.createElement("th"); //create right side
-		headerCell.innerHTML = rightLabel;
-		headerCell.contentEditable = "true";
-		row.appendChild(headerCell);
-		
-		inputLeft.value = ""; //clear input
-		inputRight.value = "";
+		var table = document.getElementById('repGrid').getElementsByTagName('tbody')[0];
+		table.insertAdjacentHTML('beforeend', `<tr><th contenteditable="true">${leftLabel}</th>${'<td contenteditable="true"></td>'.repeat(table.rows[0].cells.length-2)}<th contenteditable="true">${rightLabel}</th></tr>`);
 	}
+	
+	inputLeft.value = "";
+	inputRight.value = "";
 }
 
 function generateInterview() {

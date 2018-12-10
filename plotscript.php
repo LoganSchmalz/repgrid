@@ -19,6 +19,8 @@ var_dump($output);
 //var_dump(rmdir($workingdir));
 //echo session_id();
 
+zip($workingdir);
+echo "zipped";
 
 /** By Will https://stackoverflow.com/a/30010928
  * Creates a random unique temporary directory, with specified parameters,
@@ -80,4 +82,51 @@ function tempdir($dir = null, $prefix = 'tmp_', $mode = 0700, $maxAttempts = 100
     return $path;
 }
 
+//By Dador https://stackoverflow.com/a/4914807
+function zip($dir)
+{
+	// Get real path for our folder
+	$rootPath = realpath($dir);
+
+	// Initialize archive object
+	$zip = new ZipArchive();
+	$zip->open($dir . '/analysis.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+	// Create recursive directory iterator
+	/** @var SplFileInfo[] $files */
+	$files = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator($rootPath),
+		RecursiveIteratorIterator::LEAVES_ONLY
+	);
+
+	foreach ($files as $name => $file)
+	{
+		// Skip directories (they would be added automatically)
+		if (!$file->isDir())
+		{
+			// Get real and relative path for current file
+			$filePath = $file->getRealPath();
+			$relativePath = substr($filePath, strlen($rootPath) + 1);
+
+			// Add current file to archive
+			$zip->addFile($filePath, $relativePath);
+			
+			// Add current file to "delete list"
+			// delete it later cause ZipArchive create archive only after calling close function and ZipArchive lock files until archive created)
+			//if ($file->getFilename() != 'important.txt')
+			//{
+				$filesToDelete[] = $filePath;
+			//}
+		}
+	}
+
+	// Zip archive will be created only after closing object
+	$zip->close();
+	
+	// Delete all files from "delete list"
+	foreach ($filesToDelete as $file)
+	{
+		unlink($file);
+	}
+}
 ?>
