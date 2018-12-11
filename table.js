@@ -11,9 +11,13 @@ function generateTable() {
 					<td contenteditable="true">${document.getElementById("ratingL").value}</td>
 					<td contenteditable="true">${document.getElementById("ratingR").value}</td>
 				</tr></tbody></table>
-			<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput"><button id="addConstruct">+</button> <a id="delConstruct" href="#">Delete Construct</a></div>
-			<input type="text" id="colInput"><button id="addElement">+</button>	<a id="delElement" href="#">Delete Element</a></div>
-		<div><h3>Interview:</h3><div id="interview"></div><button id="next">Next</button>`;
+			<button id="addConstruct">+</button></div>
+			<button id="addElement">+</button><br></div>
+		<div><h3>Interview:</h3><div id="interview"></div><button id="next">Next</button><br><br><br>
+		Delete Element/Construct: <input type="text" id="delInput"><button id="del" href="#">Delete</button>`;
+	//<input type="text" id="rowLeftInput"><input type="text" id="rowRightInput">  <a id="delConstruct" href="#">Delete Construct</a>
+	//<input type="text" id="colInput"> <a id="delElement" href="#">Delete Element</a>
+	
 	
 	//add elements
 	if (elements[0] == "") { elements[0] = "Element 1"; } //default element
@@ -31,10 +35,11 @@ function generateTable() {
 }
 
 function onTableLoad() {
-	document.getElementById("addElement").addEventListener("click", addElement); //document.getElementById("colInput")
+	document.getElementById("addElement").addEventListener("click", function() {addElement();});
 	document.getElementById("addConstruct").addEventListener("click", function() {addConstruct();});
-	document.getElementById("delElement").addEventListener("click", removeElement);
-	document.getElementById("delConstruct").addEventListener("click", removeConstruct);
+	//document.getElementById("delElement").addEventListener("click", removeElement);
+	//document.getElementById("delConstruct").addEventListener("click", removeConstruct);
+	document.getElementById("del").addEventListener("click", function() {removeElementConstruct();});
 	
 	document.getElementById("xlsx").addEventListener("click", exportToXLSX);
 	document.getElementById("txt").addEventListener("click", exportToTXT);
@@ -44,7 +49,7 @@ function onTableLoad() {
 	document.getElementById("next").addEventListener("click", generateInterview);
 }
 
-function addElement(input = document.getElementById("colInput")) {
+function addElement(input = ""/*document.getElementById("colInput")*/) {
 	var label = (typeof input != 'string' ? input.value : input); //get input
 	
 	var table = document.getElementById("repGrid");
@@ -58,24 +63,21 @@ function addElement(input = document.getElementById("colInput")) {
 		table.rows[i].cells[colNum].insertAdjacentHTML('beforebegin', cell); //again, insert before last column
 	}
 	
-	input.value = ""; //clear input
+	//input.value = ""; //clear input
 }
 
-function addConstruct(inputLeft = document.getElementById("rowLeftInput"), inputRight = document.getElementById("rowRightInput")) {
+function addConstruct(inputLeft = ""/*document.getElementById("rowLeftInput")*/, inputRight = "" /*document.getElementById("rowRightInput")*/) {
 	//var leftLabel = document.getElementById("rowLeftInput");
 	//console.log(leftLabel);
 	console.log(inputLeft);
 	var leftLabel = (typeof inputLeft != 'string' ? inputLeft.value : inputLeft); //get input
 	var rightLabel = (typeof inputRight != 'string' ? inputRight.value : inputRight);
 
+	var table = document.getElementById('repGrid').getElementsByTagName('tbody')[0];
+	table.insertAdjacentHTML('beforeend', `<tr><th contenteditable="true">${leftLabel}</th>${'<td contenteditable="true"></td>'.repeat(table.rows[0].cells.length-2)}<th contenteditable="true">${rightLabel}</th></tr>`);
 	
-	if (leftLabel != "") {
-		var table = document.getElementById('repGrid').getElementsByTagName('tbody')[0];
-		table.insertAdjacentHTML('beforeend', `<tr><th contenteditable="true">${leftLabel}</th>${'<td contenteditable="true"></td>'.repeat(table.rows[0].cells.length-2)}<th contenteditable="true">${rightLabel}</th></tr>`);
-	}
-	
-	inputLeft.value = "";
-	inputRight.value = "";
+	//inputLeft.value = "";
+	//inputRight.value = "";
 }
 
 function generateInterview() {
@@ -98,6 +100,26 @@ function removeConstruct() {
 	var table = document.getElementById("repGrid");
 	if (table.rows.length > 1) { //make sure at least 2 rows are left
 		table.deleteRow(table.rows.length - 1);
+	}
+}
+
+function removeElementConstruct() {
+	var table = document.getElementById("repGrid");
+	label = document.getElementById("delInput").value;
+	console.log(label);
+	for (var i = 0; i < table.rows[0].cells.length; i++) {
+		console.log(table.rows[0].cells[i].value === label);
+		if (i > 0 && i < table.rows[0].cells.length && table.rows[0].cells[i].innerHTML == label) {
+			for (var j = 0; j < table.rows.length; j++) {
+				table.rows[j].deleteCell(i);
+			}
+		}
+	}
+	
+	for (var i = 0; i < table.rows.length; i++) {
+		if (i > 0 && table.rows[i].cells[0].innerHTML == label) {
+			table.deleteRow(i);
+		}
 	}
 }
 
@@ -217,9 +239,9 @@ function downloadAnalysis() {
 		oReq.onreadystatechange = function() {		
 			if (oReq.readyState === 4) {
 				if (oReq.status === 200) {
-					console.log("AJAX success");
-					console.log(oReq.responseText);
-					//window.open();
+					//console.log("AJAX success");
+					//console.log(oReq.responseText);
+					window.open(oReq.responseText);
 				}
 				else {
 					console.log("AJAX err");

@@ -9,18 +9,14 @@ $scores = escapeshellarg(implode("^|", $data['scores']));
 $ratingL = escapeshellarg($data['ratingL']);
 $ratingR = escapeshellarg($data['ratingR']);
 
-$workingdir = tempdir(null, session_id() . '_');
+if (!is_dir('tmp'))
+	mkdir('tmp');
+$workingdir = tempdir('tmp' . DIRECTORY_SEPARATOR, session_id() . '_');
 $args = "--name=$elements --l.name=$constructs --r.name=$notconstructs --scores=$scores --l.pole=$ratingL --r.pole=$ratingR --workdir=\"$workingdir\"";
 exec("Rscript plotscript.R $args 2>&1", $output, $return_var);
-var_dump($output);
-
-//echo $workingdir;
-//var_dump(is_dir($workingdir), is_writable($workingdir));
-//var_dump(rmdir($workingdir));
-//echo session_id();
-
+//var_dump($output);
 zip($workingdir);
-echo "zipped";
+echo str_replace('\\', '/', "/$workingdir/analysis.zip");
 
 /** By Will https://stackoverflow.com/a/30010928
  * Creates a random unique temporary directory, with specified parameters,
@@ -95,8 +91,8 @@ function zip($dir)
 	// Create recursive directory iterator
 	/** @var SplFileInfo[] $files */
 	$files = new RecursiveIteratorIterator(
-		new RecursiveDirectoryIterator($rootPath),
-		RecursiveIteratorIterator::LEAVES_ONLY
+		new RecursiveDirectoryIterator($rootPath, FileSystemIterator::SKIP_DOTS),
+		RecursiveIteratorIterator::CHILD_FIRST
 	);
 
 	foreach ($files as $name => $file)
@@ -110,23 +106,19 @@ function zip($dir)
 
 			// Add current file to archive
 			$zip->addFile($filePath, $relativePath);
-			
+		}
 			// Add current file to "delete list"
 			// delete it later cause ZipArchive create archive only after calling close function and ZipArchive lock files until archive created)
-			//if ($file->getFilename() != 'important.txt')
-			//{
-				$filesToDelete[] = $filePath;
-			//}
-		}
+			if ($filePath != $rootPath)
+			$filesToDelete[] = $file;
 	}
 
 	// Zip archive will be created only after closing object
 	$zip->close();
 	
 	// Delete all files from "delete list"
-	foreach ($filesToDelete as $file)
-	{
-		unlink($file);
+	foreach ($filesToDelete as $file) {
+		$file->isDir() ?  rmdir($file) : unlink($file);
 	}
 }
 ?>
