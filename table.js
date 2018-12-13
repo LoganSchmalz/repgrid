@@ -25,9 +25,9 @@ function generateTable() {
 		addElement(elements[i].trim());
 	}
 	//add constructs
-	if (leftConstructs[0] == "") { leftLabels[0] = "Construct 1"; } //default construct
+	if (!leftConstructs[0]) { leftConstructs[0] = "Construct 1"; } //default construct
 	for (var i = 0; i < leftConstructs.length; i++) {
-		if (rightConstructs[i] == "") { rightConstructs[i] = `Not ${leftConstructs[i]}`; }
+		if (!rightConstructs[i]) { rightConstructs[i] = `Not ${leftConstructs[i]}`; }
 		addConstruct(leftConstructs[i].trim(), rightConstructs[i].trim());
 	}
 	
@@ -59,7 +59,7 @@ function addElement(input = ""/*document.getElementById("colInput")*/) {
 	table.rows[0].cells[colNum].insertAdjacentHTML('beforebegin', headerCell);		
 	
 	for (var i = 1; i < table.rows.length; i++) { //make input for every other cell in column
-		var cell = `<th contenteditable="true"></th>`;
+		var cell = `<td contenteditable="true"></td>`;
 		table.rows[i].cells[colNum].insertAdjacentHTML('beforebegin', cell); //again, insert before last column
 	}
 	
@@ -83,8 +83,17 @@ function addConstruct(inputLeft = ""/*document.getElementById("rowLeftInput")*/,
 function generateInterview() {
 	var table = document.getElementById("repGrid");
 	var numCol = table.rows[0].cells.length - 2;
-	var interview = document.getElementById("interview");
-	interview.innerHTML += `${table.rows[0].cells[parseInt(numCol * Math.random(), 10) + 1].innerHTML}, ${table.rows[0].cells[parseInt(numCol * Math.random(), 10) + 1].innerHTML}, ${table.rows[0].cells[parseInt(numCol * Math.random(), 10) + 1].innerHTML}<br>`;
+	if (numCol > 2) {
+		var interview = document.getElementById("interview");
+		var el1 = parseInt(numCol * Math.random(), 10) + 1;
+		var el2 = parseInt(numCol * Math.random(), 10) + 1;
+		while (el2 == el1)
+			el2 = parseInt(numCol * Math.random(), 10) + 1;
+		var el3 = parseInt(numCol * Math.random(), 10) + 1;
+		while (el3 == el1 || el3 == el2)
+			el3 = parseInt(numCol * Math.random(), 10) + 1;
+		interview.innerHTML += `${table.rows[0].cells[el1].innerHTML}, ${table.rows[0].cells[el2].innerHTML}, ${table.rows[0].cells[el3].innerHTML}<br>`;
+	}
 }
 
 function removeElement() {
@@ -128,6 +137,7 @@ function exportToXLSX() {
 		formats: ["xlsx"],
 		exportButtons: false
 	});
+	TableExport.prototype.typeConfig.date.assert = function(v) {return false;};
 	var exportData = instance.getExportData()["repGrid"]["xlsx"];
 	instance.export2file(exportData.data, exportData.mimeType, exportData.filename, exportData.fileExtension);
 }

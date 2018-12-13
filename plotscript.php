@@ -2,9 +2,9 @@
 session_start();
 $data = file_get_contents('php://input');
 $data = json_decode($data, true);
-$elements = escapeshellarg(implode("|", $data['elements']));
-$constructs = escapeshellarg(implode("|", $data['constructs']));
-$notconstructs = escapeshellarg(implode("|", $data['notconstructs']));
+$elements = escapeshellarg(implode("^|", $data['elements']));
+$constructs = escapeshellarg(implode("^|", $data['constructs']));
+$notconstructs = escapeshellarg(implode("^|", $data['notconstructs']));
 $scores = escapeshellarg(implode("^|", $data['scores']));
 $ratingL = escapeshellarg($data['ratingL']);
 $ratingR = escapeshellarg($data['ratingR']);

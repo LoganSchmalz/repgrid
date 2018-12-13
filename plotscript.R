@@ -26,7 +26,6 @@ if (is.na(opt$r.pole) || is.na(opt$l.pole))
 }
 if (!is.null(opt$workdir)) 
 {
-	print(opt$workdir)
 	setwd(opt$workdir)
 }
 #getwd()
